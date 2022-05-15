@@ -2,6 +2,7 @@ import sys
 
 from lexer import Lexer
 from parser import Parser
+from interpreter import Interpreter
 
 
 def run(src):
@@ -10,6 +11,9 @@ def run(src):
 
     parser = Parser(tokens)
     expr = parser.expression()
+
+    interpreter = Interpreter()
+    print(interpreter.evaluate(expr))
 
 
 def main():
