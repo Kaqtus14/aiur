@@ -1,14 +1,15 @@
 import sys
 
 from lexer import Lexer
+from parser import Parser
 
 
 def run(src):
     lexer = Lexer(src)
     tokens = lexer.scan_tokens()
 
-    for token in tokens:
-        print(token)
+    parser = Parser(tokens)
+    expr = parser.expression()
 
 
 def main():

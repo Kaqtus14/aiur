@@ -15,7 +15,7 @@ class BinaryExpr(Expr):
     right: Expr
 
     def accept(self, acceptor):
-        acceptor.visit_binary(self)
+        return acceptor.visit_binary(self)
 
 
 @dataclass
@@ -23,15 +23,15 @@ class GroupingExpr(Expr):
     expr: Expr
 
     def accept(self, acceptor):
-        acceptor.visit_grouping(self)
+        return acceptor.visit_grouping(self)
 
 
 @dataclass
 class LiteralExpr(Expr):
-    literal: Any
+    value: Any
 
     def accept(self, acceptor):
-        acceptor.visit_literal(self)
+        return acceptor.visit_literal(self)
 
 
 @dataclass
@@ -40,4 +40,4 @@ class UnaryExpr(Expr):
     right: Expr
 
     def accept(self, acceptor):
-        acceptor.visit_unary(self)
+        return acceptor.visit_unary(self)

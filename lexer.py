@@ -146,7 +146,7 @@ class Lexer:
             raise SyntaxError(f"unexpected character: {c}")
 
     def parse_number(self):
-        value = ""
+        value = self.src[self.current-1]
         while not self.eof() and (self.peek().isdigit() or self.peek() == "."):
             value += self.consume()
 
