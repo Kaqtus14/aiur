@@ -1,5 +1,7 @@
 import sys
+
 from lexer import Lexer
+
 
 def run(src):
     lexer = Lexer(src)
@@ -8,6 +10,7 @@ def run(src):
     for token in tokens:
         print(token)
 
+
 def main():
     if len(sys.argv) == 1:
         while True:
@@ -15,6 +18,7 @@ def main():
     else:
         with open(sys.argv[1]) as f:
             run(f.read())
-    
+
+
 if __name__ == "__main__":
     main()
