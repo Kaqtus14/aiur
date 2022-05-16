@@ -1,4 +1,4 @@
-from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, ExpressionStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, LogicalExpr, UnaryExpr, PrintStmt, VarStmt, VariableExpr, WhileStmt
+from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, ExpressionStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, LogicalExpr, ReturnStmt, UnaryExpr, PrintStmt, VarStmt, VariableExpr, WhileStmt
 from lexer import TokenType
 
 
@@ -30,7 +30,9 @@ class Parser:
         elif self.match(TokenType.LBRACE):
             return self.block_statement()
         elif self.match(TokenType.FUN):
-            return self.function_statement("function");
+            return self.function_statement("function")
+        elif self.match(TokenType.RETURN):
+            return self.return_statement()
         else:
             return self.expression_statement()
 
@@ -89,6 +91,17 @@ class Parser:
         if not self.match(TokenType.RBRACE):
             raise SyntaxError("Expected } after block")
         return BlockStmt(statements)
+
+    def return_statement(self):
+        keyword = self.previous()
+        value = None
+        if not self.check(TokenType.SEMICOLON):
+            value = self.expression()
+
+        if not self.match(TokenType.SEMICOLON):
+            raise SyntaxError("Expected ; after return value")
+
+        return ReturnStmt(keyword, value)
 
     def print_statement(self):
         value = self.expression()

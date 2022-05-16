@@ -139,6 +139,15 @@ class VarStmt(Stmt):
 
 
 @dataclass
+class ReturnStmt(Stmt):
+    keyword: Token
+    value: Expr
+
+    def accept(self, acceptor):
+        return acceptor.visit_return_stmt(self)
+
+
+@dataclass
 class BlockStmt(Stmt):
     statements: List[Stmt]
 

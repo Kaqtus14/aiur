@@ -1,7 +1,13 @@
 import time
-from typing import Callable
+from dataclasses import dataclass
+from typing import Any, Callable
 
 from lexer import TokenType
+
+
+@dataclass
+class Return(Exception):
+    value: Any
 
 
 class Callable:
@@ -18,7 +24,10 @@ class Function(Callable):
         for i, param in enumerate(self.declaration.params):
             env.define(param.lexeme, args[i])
 
-        interpreter.execute_block(self.declaration.body.statements, env)
+        try:
+            interpreter.execute_block(self.declaration.body.statements, env)
+        except Return as r:
+            return r.value
 
     def arity(self):
         return len(self.declaration.params)
@@ -90,6 +99,12 @@ class Interpreter:
         function = Function(stmt)
         self.env.define(stmt.name.lexeme, function)
 
+    def visit_return_stmt(self, stmt):
+        value = None
+        if stmt.value is not None:
+            value = self.evaluate(stmt.value)
+        raise Return(value)
+
     def visit_var_stmt(self, stmt):
         value = self.evaluate(
             stmt.initializer) if stmt.initializer is not None else None
@@ -145,7 +160,7 @@ class Interpreter:
             raise TypeError(
                 f"Expected {callee.arity()} arguments, got {len(arguments)}")
 
-        callee.call(self, arguments)
+        return callee.call(self, arguments)
 
     def visit_binary(self, expr):
         left = self.evaluate(expr.left)
