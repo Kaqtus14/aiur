@@ -1,4 +1,4 @@
-from expr import AssignExpr, BinaryExpr, ExpressionStmt, GroupingExpr, LiteralExpr, UnaryExpr, PrintStmt, VarStmt, VariableExpr
+from expr import AssignExpr, BinaryExpr, BlockStmt, ExpressionStmt, GroupingExpr, LiteralExpr, UnaryExpr, PrintStmt, VarStmt, VariableExpr
 from lexer import TokenType
 
 
@@ -18,11 +18,25 @@ class Parser:
     def declaration(self):
         if self.match(TokenType.VAR):
             return self.var_declaration()
+        return self.statement()
 
     def statement(self):
         if self.match(TokenType.PRINT):
             return self.print_statement()
-        return self.expression_statement()
+        elif self.match(TokenType.LBRACE):
+            return self.block_statement()
+        else:
+            return self.expression_statement()
+
+    def block_statement(self):
+        statements = []
+
+        while not self.check(TokenType.RBRACE) and not self.eof():
+            statements.append(self.declaration())
+
+        if not self.match(TokenType.RBRACE):
+            raise SyntaxError("Expected } after block")
+        return BlockStmt(statements)
 
     def print_statement(self):
         value = self.expression()
@@ -37,16 +51,15 @@ class Parser:
         return ExpressionStmt(expr)
 
     def var_declaration(self):
-        if not self.check(TokenType.IDENTIFIER):
+        if not self.match(TokenType.IDENTIFIER):
             raise SyntaxError("Expected variable name")
         name = self.previous()
 
         initializer = None
         if self.match(TokenType.ASSIGN):
-            print("a")
             initializer = self.expression()
 
-        if not self.check(TokenType.SEMICOLON):
+        if not self.match(TokenType.SEMICOLON):
             raise SyntaxError("Expected ; after declaration")
         return VarStmt(name, initializer)
 
@@ -57,7 +70,6 @@ class Parser:
         expr = self.equality()
 
         if self.match(TokenType.EQ):
-            equals = self.previous()
             value = self.assignment()
 
             if type(expr) == VariableExpr:

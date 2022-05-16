@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, List
 
 from lexer import Token
 
@@ -95,4 +95,11 @@ class VarStmt(Stmt):
     initializer: Expr
 
     def accept(self, acceptor):
-        return acceptor.visit_variable_stmt(self)
+        return acceptor.visit_var_stmt(self)
+
+@dataclass
+class BlockStmt(Stmt):
+    statements: List[Stmt]
+
+    def accept(self, acceptor):
+        return acceptor.visit_block_stmt(self)

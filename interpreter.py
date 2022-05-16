@@ -2,19 +2,27 @@ from lexer import TokenType
 
 
 class Env:
-    def __init__(self):
+    def __init__(self, enclosing=None):
         self.symbols = {}
+        self.enclosing = enclosing
+
+    def is_defined(self, key):
+        return key in self.symbols or (self.enclosing is not None and self.enclosing.is_defined(key))
 
     def define(self, key, value, check=False):
-        if check:
-            if not key in self.symbols:
-                raise SyntaxError(f"Undefined variable: {key}")
-        self.symbols[key] = value
+        if not check or key in self.symbols:
+            self.symbols[key] = value
+        elif key in self.enclosing.symbols:
+            self.enclosing.symbols.define(key, value, True)
+        else:
+            raise SyntaxError(f"Undefined variable: {key}")
 
     def get(self, key):
-        try:
+        if key in self.symbols:
             return self.symbols[key]
-        except IndexError:
+        elif self.enclosing is not None and self.enclosing.is_defined(key):
+            return self.enclosing.get(key)
+        else:
             raise SyntaxError(f"Undefined variable: {key}")
 
 
@@ -42,6 +50,9 @@ class Interpreter:
         value = self.evaluate(stmt.initializer) if stmt is not None else None
         self.env.define(stmt.name.lexeme, value)
 
+    def visit_block_stmt(self, stmt):
+        self.execute_block(stmt.statements, Env(self.env))
+
     def visit_literal(self, expr):
         return expr.value
 
@@ -49,7 +60,7 @@ class Interpreter:
         return self.evaluate(expr.expr)
 
     def visit_variable(self, expr):
-        return self.env.get(expr.name)
+        return self.env.get(expr.name.lexeme)
 
     def visit_assign(self, expr):
         value = self.evaluate(expr.value)
@@ -100,6 +111,16 @@ class Interpreter:
             return left <= right
         else:
             assert False
+
+    def execute_block(self, statements, env):
+        prev_env = self.env
+        try:
+            self.env = env
+
+            for stmt in statements:
+                self.execute(stmt)
+        finally:
+            self.env = prev_env
 
     @staticmethod
     def check_number(*vs):
