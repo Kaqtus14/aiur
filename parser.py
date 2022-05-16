@@ -1,4 +1,4 @@
-from expr import AssignExpr, BinaryExpr, BlockStmt, ExpressionStmt, GroupingExpr, IfStmt, LiteralExpr, LogicalExpr, UnaryExpr, PrintStmt, VarStmt, VariableExpr, WhileStmt
+from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, ExpressionStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, LogicalExpr, UnaryExpr, PrintStmt, VarStmt, VariableExpr, WhileStmt
 from lexer import TokenType
 
 
@@ -29,6 +29,8 @@ class Parser:
             return self.while_statement()
         elif self.match(TokenType.LBRACE):
             return self.block_statement()
+        elif self.match(TokenType.FUN):
+            return self.function_statement("function");
         else:
             return self.expression_statement()
 
@@ -54,6 +56,29 @@ class Parser:
         body = self.statement()
 
         return WhileStmt(condition, body)
+
+    def function_statement(self, kind):
+        if not self.match(TokenType.IDENTIFIER):
+            raise SyntaxError(f"Expected {kind}")
+        name = self.previous()
+
+        if not self.match(TokenType.LPAREN):
+            raise SyntaxError("Expected (")
+
+        parameters = []
+
+        if not self.check(TokenType.RPAREN):
+            parameters.append(self.consume())
+            while self.match(TokenType.COMMA):
+                parameters.append(self.consume())
+
+        if not self.match(TokenType.RPAREN):
+            raise SyntaxError("Expected )")
+        if not self.match(TokenType.LBRACE):
+            raise SyntaxError("Expected {")
+
+        body = self.block_statement()
+        return FunctionStmt(name, parameters, body)
 
     def block_statement(self):
         statements = []
@@ -172,7 +197,31 @@ class Parser:
             right = self.unary()
             return UnaryExpr(op, right)
 
-        return self.primary()
+        return self.call()
+
+    def call(self):
+        expr = self.primary()
+
+        while True:
+            if self.match(TokenType.LPAREN):
+                expr = self.finish_call(expr)
+            else:
+                break
+
+        return expr
+
+    def finish_call(self, callee):
+        arguments = []
+        if not self.check(TokenType.RPAREN):
+            arguments.append(self.expression())
+            while self.match(TokenType.COMMA):
+                arguments.append(self.expression())
+        
+        if not self.match(TokenType.RPAREN):
+            raise SyntaxError("Expected ) after arguments")
+        paren = self.previous()
+
+        return CallExpr(callee, paren, arguments)
 
     def primary(self):
         if self.match(TokenType.TRUE):

@@ -1,4 +1,30 @@
+import time
+from typing import Callable
+
 from lexer import TokenType
+
+
+class Callable:
+    def __init__(self, arity_fn, call_fn, tostring_fn):
+        self.arity_fn, self.call_fn, self.tostring_fn = arity_fn, call_fn, tostring_fn
+
+
+class Function(Callable):
+    def __init__(self, declaration):
+        self.declaration = declaration
+
+    def call(self, interpreter, args):
+        env = Env(interpreter.globals)
+        for i, param in enumerate(self.declaration.params):
+            env.define(param.lexeme, args[i])
+
+        interpreter.execute_block(self.declaration.body.statements, env)
+
+    def arity(self):
+        return len(self.declaration.params)
+
+    def tostring(self):
+        return f"<function {self.declaration.name}>"
 
 
 class Env:
@@ -28,7 +54,11 @@ class Env:
 
 class Interpreter:
     def __init__(self):
-        self.env = Env()
+        self.globals = Env()
+        self.env = self.globals
+
+        self.globals.define("clock", Callable(
+            lambda: 0, lambda: time.time()/1000, lambda: "<native function>"))
 
     def interpret(self, statements):
         for stmt in statements:
@@ -56,8 +86,13 @@ class Interpreter:
         while self.evaluate(stmt.condition):
             self.execute(stmt.body)
 
+    def visit_function_stmt(self, stmt):
+        function = Function(stmt)
+        self.env.define(stmt.name.lexeme, function)
+
     def visit_var_stmt(self, stmt):
-        value = self.evaluate(stmt.initializer) if stmt.initializer is not None else None
+        value = self.evaluate(
+            stmt.initializer) if stmt.initializer is not None else None
         self.env.define(stmt.name.lexeme, value)
 
     def visit_block_stmt(self, stmt):
@@ -101,6 +136,16 @@ class Interpreter:
             assert False
 
         return self.evaluate(expr.right)
+
+    def visit_call(self, expr):
+        callee = self.evaluate(expr.callee)
+        arguments = list(map(self.evaluate, expr.arguments))
+
+        if len(arguments) != callee.arity():
+            raise TypeError(
+                f"Expected {callee.arity()} arguments, got {len(arguments)}")
+
+        callee.call(self, arguments)
 
     def visit_binary(self, expr):
         left = self.evaluate(expr.left)

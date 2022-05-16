@@ -70,6 +70,16 @@ class AssignExpr(Expr):
         return acceptor.visit_assign(self)
 
 
+@dataclass
+class CallExpr(Expr):
+    callee: Expr
+    paren: Token
+    arguments: List[Expr]
+
+    def accept(self, acceptor):
+        return acceptor.visit_call(self)
+
+
 class Stmt:
     pass
 
@@ -99,6 +109,16 @@ class WhileStmt(Stmt):
 
     def accept(self, acceptor):
         return acceptor.visit_while_stmt(self)
+
+
+@dataclass
+class FunctionStmt(Stmt):
+    name: Token
+    params: List[Token]
+    body: List[Stmt]
+
+    def accept(self, acceptor):
+        return acceptor.visit_function_stmt(self)
 
 
 @dataclass
