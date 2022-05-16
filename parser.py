@@ -1,4 +1,4 @@
-from expr import AssignExpr, BinaryExpr, BlockStmt, ExpressionStmt, GroupingExpr, LiteralExpr, UnaryExpr, PrintStmt, VarStmt, VariableExpr
+from expr import AssignExpr, BinaryExpr, BlockStmt, ExpressionStmt, GroupingExpr, IfStmt, LiteralExpr, LogicalExpr, UnaryExpr, PrintStmt, VarStmt, VariableExpr, WhileStmt
 from lexer import TokenType
 
 
@@ -23,10 +23,37 @@ class Parser:
     def statement(self):
         if self.match(TokenType.PRINT):
             return self.print_statement()
+        elif self.match(TokenType.IF):
+            return self.if_statement()
+        elif self.match(TokenType.WHILE):
+            return self.while_statement()
         elif self.match(TokenType.LBRACE):
             return self.block_statement()
         else:
             return self.expression_statement()
+
+    def if_statement(self):
+        if not self.match(TokenType.LPAREN):
+            raise SyntaxError("Expected ( after if")
+        condition = self.expression()
+        if not self.match(TokenType.RPAREN):
+            raise SyntaxError("Expected ) after condition")
+
+        then_branch = self.statement()
+        else_branch = self.statement() if self.match(TokenType.ELSE) else None
+
+        return IfStmt(condition, then_branch, else_branch)
+
+    def while_statement(self):
+        if not self.match(TokenType.LPAREN):
+            raise SyntaxError("Expected ( after while")
+        condition = self.expression()
+        if not self.match(TokenType.RPAREN):
+            raise SyntaxError("Expected ) after condition")
+
+        body = self.statement()
+
+        return WhileStmt(condition, body)
 
     def block_statement(self):
         statements = []
@@ -66,13 +93,33 @@ class Parser:
     def expression(self):
         return self.assignment()
 
-    def assignment(self):
+    def _or(self):
+        expr = self._and()
+
+        while self.match(TokenType.OR):
+            op = self.previous()
+            right = self._and()
+            expr = LogicalExpr(expr, op, right)
+
+        return expr
+
+    def _and(self):
         expr = self.equality()
 
-        if self.match(TokenType.EQ):
+        while self.match(TokenType.AND):
+            op = self.previous()
+            right = self.equality()
+            expr = LogicalExpr(expr, op, right)
+
+        return expr
+
+    def assignment(self):
+        expr = self._or()
+
+        if self.match(TokenType.ASSIGN):
             value = self.assignment()
 
-            if type(expr) == VariableExpr:
+            if isinstance(expr, VariableExpr):
                 return AssignExpr(expr.name, value)
             else:
                 raise SyntaxError("Invalid assignment target")
@@ -144,7 +191,7 @@ class Parser:
 
             return GroupingExpr(expr)
         elif self.match(TokenType.IDENTIFIER):
-            return VariableExpr(self.previous());
+            return VariableExpr(self.previous())
         else:
             raise SyntaxError(f"unexpected {self.peek()}")
 

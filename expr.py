@@ -44,12 +44,13 @@ class UnaryExpr(Expr):
 
 
 @dataclass
-class UnaryExpr(Expr):
+class LogicalExpr(Expr):
+    left: Expr
     op: Token
     right: Expr
 
     def accept(self, acceptor):
-        return acceptor.visit_unary(self)
+        return acceptor.visit_logical(self)
 
 
 @dataclass
@@ -82,6 +83,25 @@ class ExpressionStmt(Stmt):
 
 
 @dataclass
+class IfStmt(Stmt):
+    condition: Expr
+    then_branch: Stmt
+    else_branch: Stmt
+
+    def accept(self, acceptor):
+        return acceptor.visit_if_stmt(self)
+
+
+@dataclass
+class WhileStmt(Stmt):
+    condition: Expr
+    body: Stmt
+
+    def accept(self, acceptor):
+        return acceptor.visit_while_stmt(self)
+
+
+@dataclass
 class PrintStmt(Stmt):
     expr: Token
 
@@ -96,6 +116,7 @@ class VarStmt(Stmt):
 
     def accept(self, acceptor):
         return acceptor.visit_var_stmt(self)
+
 
 @dataclass
 class BlockStmt(Stmt):

@@ -13,7 +13,7 @@ class Env:
         if not check or key in self.symbols:
             self.symbols[key] = value
         elif key in self.enclosing.symbols:
-            self.enclosing.symbols.define(key, value, True)
+            self.enclosing.define(key, value, True)
         else:
             raise SyntaxError(f"Undefined variable: {key}")
 
@@ -46,8 +46,18 @@ class Interpreter:
     def visit_print_stmt(self, stmt):
         print(self.evaluate(stmt.expr))
 
+    def visit_if_stmt(self, stmt):
+        if self.evaluate(stmt.condition):
+            self.execute(stmt.then_branch)
+        elif stmt.else_branch is not None:
+            self.execute(stmt.else_branch)
+
+    def visit_while_stmt(self, stmt):
+        while self.evaluate(stmt.condition):
+            self.execute(stmt.body)
+
     def visit_var_stmt(self, stmt):
-        value = self.evaluate(stmt.initializer) if stmt is not None else None
+        value = self.evaluate(stmt.initializer) if stmt.initializer is not None else None
         self.env.define(stmt.name.lexeme, value)
 
     def visit_block_stmt(self, stmt):
@@ -64,7 +74,7 @@ class Interpreter:
 
     def visit_assign(self, expr):
         value = self.evaluate(expr.value)
-        self.env.define(expr.name, value, True)
+        self.env.define(expr.name.lexeme, value, True)
         return value
 
     def visit_unary(self, expr):
@@ -77,6 +87,20 @@ class Interpreter:
             return not right
         else:
             assert False
+
+    def visit_logical(self, expr):
+        left = self.evaluate(expr.left)
+
+        if expr.op.typ == TokenType.OR:
+            if left:
+                return bool(left)
+        elif expr.op.typ == TokenType.AND:
+            if not left:
+                return bool(left)
+        else:
+            assert False
+
+        return self.evaluate(expr.right)
 
     def visit_binary(self, expr):
         left = self.evaluate(expr.left)
