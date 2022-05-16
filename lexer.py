@@ -154,8 +154,8 @@ class Lexer:
 
 
     def parse_identifier(self):
-        value = ""
-        while not self.eof() and self.peek() != "\"":
+        value = self.src[self.current-1]
+        while not self.eof() and self.peek().isalnum():
             value += self.consume()
 
         self.add_token(KEYWORDS.get(value, TokenType.IDENTIFIER))

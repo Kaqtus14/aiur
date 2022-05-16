@@ -2,8 +2,21 @@ from lexer import TokenType
 
 
 class Interpreter:
+    def interpret(self, statements):
+        for stmt in statements:
+            self.execute(stmt)
+
+    def execute(self, stmt):
+        return stmt.accept(self)
+
     def evaluate(self, expr):
         return expr.accept(self)
+
+    def visit_expression_stmt(self, stmt):
+        self.evaluate(stmt.expr)
+
+    def visit_print_stmt(self, stmt):
+        print(self.evaluate(stmt.expr))
 
     def visit_literal(self, expr):
         return expr.value
@@ -24,9 +37,7 @@ class Interpreter:
 
     def visit_binary(self, expr):
         left = self.evaluate(expr.left)
-        print(expr.left, left)
         right = self.evaluate(expr.right)
-        print(expr.right, right)
 
         if expr.op.typ == TokenType.PLUS:
             return left + right

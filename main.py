@@ -10,10 +10,10 @@ def run(src):
     tokens = lexer.scan_tokens()
 
     parser = Parser(tokens)
-    expr = parser.expression()
+    statements = parser.parse()
 
     interpreter = Interpreter()
-    print(interpreter.evaluate(expr))
+    interpreter.interpret(statements)
 
 
 def main():

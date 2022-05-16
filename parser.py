@@ -1,4 +1,4 @@
-from expr import BinaryExpr, GroupingExpr, LiteralExpr, UnaryExpr
+from expr import BinaryExpr, ExpressionStmt, GroupingExpr, LiteralExpr, UnaryExpr, PrintStmt
 from lexer import TokenType
 
 
@@ -6,6 +6,31 @@ class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.current = 0
+
+    def parse(self):
+        statements = []
+
+        while not self.eof():
+            statements.append(self.statement())
+
+        return statements
+
+    def statement(self):
+        if self.match(TokenType.PRINT):
+            return self.print_statement()
+        return self.expression_statement()
+
+    def print_statement(self):
+        value = self.expression()
+        if not self.match(TokenType.SEMICOLON):
+            raise SyntaxError("Expected ; after value")
+        return PrintStmt(value)
+
+    def expression_statement(self):
+        expr = self.expression()
+        if not self.match(TokenType.SEMICOLON):
+            raise SyntaxError("Expected ; after expression")
+        return ExpressionStmt(expr)
 
     def expression(self):
         return self.equality()
@@ -54,7 +79,7 @@ class Parser:
         if self.match(TokenType.BANG, TokenType.MINUS):
             op = self.previous()
             right = self.unary()
-            expr = UnaryExpr(op, right)
+            return UnaryExpr(op, right)
 
         return self.primary()
 
@@ -69,15 +94,13 @@ class Parser:
             return LiteralExpr(self.previous().literal)
         elif self.match(TokenType.LPAREN):
             expr = self.expression()
-            
+
             if self.consume().typ != TokenType.RPAREN:
                 raise SyntaxError("expected ) after expression")
 
             return GroupingExpr(expr)
         else:
-            assert False
-
-        
+            raise SyntaxError(f"unexpected {self.peek()}")
 
     def match(self, *types):
         for typ in types:
