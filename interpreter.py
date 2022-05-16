@@ -1,7 +1,27 @@
 from lexer import TokenType
 
 
+class Env:
+    def __init__(self):
+        self.symbols = {}
+
+    def define(self, key, value, check=False):
+        if check:
+            if not key in self.symbols:
+                raise SyntaxError(f"Undefined variable: {key}")
+        self.symbols[key] = value
+
+    def get(self, key):
+        try:
+            return self.symbols[key]
+        except IndexError:
+            raise SyntaxError(f"Undefined variable: {key}")
+
+
 class Interpreter:
+    def __init__(self):
+        self.env = Env()
+
     def interpret(self, statements):
         for stmt in statements:
             self.execute(stmt)
@@ -18,11 +38,23 @@ class Interpreter:
     def visit_print_stmt(self, stmt):
         print(self.evaluate(stmt.expr))
 
+    def visit_var_stmt(self, stmt):
+        value = self.evaluate(stmt.initializer) if stmt is not None else None
+        self.env.define(stmt.name.lexeme, value)
+
     def visit_literal(self, expr):
         return expr.value
 
     def visit_grouping(self, expr):
         return self.evaluate(expr.expr)
+
+    def visit_variable(self, expr):
+        return self.env.get(expr.name)
+
+    def visit_assign(self, expr):
+        value = self.evaluate(expr.value)
+        self.env.define(expr.name, value, True)
+        return value
 
     def visit_unary(self, expr):
         right = self.evaluate(expr.right)

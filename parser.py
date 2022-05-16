@@ -1,4 +1,4 @@
-from expr import BinaryExpr, ExpressionStmt, GroupingExpr, LiteralExpr, UnaryExpr, PrintStmt
+from expr import AssignExpr, BinaryExpr, ExpressionStmt, GroupingExpr, LiteralExpr, UnaryExpr, PrintStmt, VarStmt, VariableExpr
 from lexer import TokenType
 
 
@@ -11,9 +11,13 @@ class Parser:
         statements = []
 
         while not self.eof():
-            statements.append(self.statement())
+            statements.append(self.declaration())
 
         return statements
+
+    def declaration(self):
+        if self.match(TokenType.VAR):
+            return self.var_declaration()
 
     def statement(self):
         if self.match(TokenType.PRINT):
@@ -32,8 +36,36 @@ class Parser:
             raise SyntaxError("Expected ; after expression")
         return ExpressionStmt(expr)
 
+    def var_declaration(self):
+        if not self.check(TokenType.IDENTIFIER):
+            raise SyntaxError("Expected variable name")
+        name = self.previous()
+
+        initializer = None
+        if self.match(TokenType.ASSIGN):
+            print("a")
+            initializer = self.expression()
+
+        if not self.check(TokenType.SEMICOLON):
+            raise SyntaxError("Expected ; after declaration")
+        return VarStmt(name, initializer)
+
     def expression(self):
-        return self.equality()
+        return self.assignment()
+
+    def assignment(self):
+        expr = self.equality()
+
+        if self.match(TokenType.EQ):
+            equals = self.previous()
+            value = self.assignment()
+
+            if type(expr) == VariableExpr:
+                return AssignExpr(expr.name, value)
+            else:
+                raise SyntaxError("Invalid assignment target")
+
+        return expr
 
     def equality(self):
         expr = self.comparison()
@@ -99,6 +131,8 @@ class Parser:
                 raise SyntaxError("expected ) after expression")
 
             return GroupingExpr(expr)
+        elif self.match(TokenType.IDENTIFIER):
+            return VariableExpr(self.previous());
         else:
             raise SyntaxError(f"unexpected {self.peek()}")
 

@@ -52,6 +52,23 @@ class UnaryExpr(Expr):
         return acceptor.visit_unary(self)
 
 
+@dataclass
+class VariableExpr(Expr):
+    name: Token
+
+    def accept(self, acceptor):
+        return acceptor.visit_variable(self)
+
+
+@dataclass
+class AssignExpr(Expr):
+    name: Token
+    value: Expr
+
+    def accept(self, acceptor):
+        return acceptor.visit_assign(self)
+
+
 class Stmt:
     pass
 
@@ -65,8 +82,17 @@ class ExpressionStmt(Stmt):
 
 
 @dataclass
-class PrintStmt(Expr):
+class PrintStmt(Stmt):
     expr: Token
 
     def accept(self, acceptor):
         return acceptor.visit_print_stmt(self)
+
+
+@dataclass
+class VarStmt(Stmt):
+    name: Token
+    initializer: Expr
+
+    def accept(self, acceptor):
+        return acceptor.visit_variable_stmt(self)
