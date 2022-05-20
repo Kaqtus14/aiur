@@ -122,11 +122,11 @@ class FunctionStmt(Stmt):
 
 
 @dataclass
-class PrintStmt(Stmt):
+class DiscardStmt(Stmt):
     expr: Token
 
     def accept(self, acceptor):
-        return acceptor.visit_print_stmt(self)
+        return acceptor.visit_discard_stmt(self)
 
 
 @dataclass

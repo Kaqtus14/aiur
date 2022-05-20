@@ -1,0 +1,11 @@
+func main() {
+    let SIZE = 10
+
+    let i = 0
+    while(i < SIZE) {
+        $ write(repeat(" ", SIZE-i))
+        $ write(repeat("*", i*2-1))
+        $ print("")
+        i = i + 1
+    }
+}

@@ -38,7 +38,7 @@ class TokenType(Enum):
     IF = auto()
     NIL = auto()
     OR = auto()
-    PRINT = auto()
+    DISCARD = auto()
     RETURN = auto()
     SUPER = auto()
     THIS = auto()
@@ -59,12 +59,11 @@ KEYWORDS = {
     "if": TokenType.IF,
     "nil": TokenType.NIL,
     "or": TokenType.OR,
-    "print": TokenType.PRINT,
     "return": TokenType.RETURN,
     "super": TokenType.SUPER,
     "this": TokenType.THIS,
     "true": TokenType.TRUE,
-    "var": TokenType.VAR,
+    "let": TokenType.VAR,
     "while": TokenType.WHILE,
 }
 
@@ -122,6 +121,8 @@ class Lexer:
                 self.add_token(TokenType.SLASH)
         elif c == ";":
             self.add_token(TokenType.SEMICOLON)
+        elif c == "$":
+            self.add_token(TokenType.DISCARD)
         elif c == "!":
             self.add_token(TokenType.NEQ if self.match("=")
                            else TokenType.BANG)

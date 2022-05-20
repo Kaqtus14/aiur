@@ -5,7 +5,7 @@ class CompileError(Exception):
 class CodeGenerator:
     def __init__(self):
         self.out = ""
-        self.symbols = set()
+        self.symbols = set(["print", "write", "repeat"])
 
     def compile(self, statements):
         self.out = "#include \"lib.h\"\n\n"
@@ -27,10 +27,9 @@ class CodeGenerator:
     def visit_expression_stmt(self, stmt):
         self.compile_expr(stmt.expr)
 
-    def visit_print_stmt(self, stmt):
-        self.emit("std::cout << ")
+    def visit_discard_stmt(self, stmt):
         self.compile_expr(stmt.expr)
-        self.emit(" << std::endl;\n")
+        self.emitln(";")
 
     def visit_if_stmt(self, stmt):
         self.emit("if (")
@@ -54,8 +53,9 @@ class CodeGenerator:
         self.symbols.add(stmt.name.lexeme)
 
         if stmt.name.lexeme != "main":
-            for i in range(len(stmt.params)):
-                self.emitln(f"template <typename T{i}>")
+            self.emit(f"template <")
+            self.emit(", ".join([f"typename T{i}" for i in range(len(stmt.params))]))
+            self.emitln(">")
             self.emit("auto ")
         else:
             self.emit("int ")
@@ -98,7 +98,7 @@ class CodeGenerator:
         elif isinstance(expr.value, (int, float)):
             self.emit(str(expr.value))
         elif isinstance(expr.value, str):
-            self.emit(f"\"{expr.value}\"")
+            self.emit(f"std::string(\"{expr.value}\")")
         else:
             raise CompileError(f"Unexpected literal type: {type(expr.value)}")
 
