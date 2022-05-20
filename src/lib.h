@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include <netdb.h>
 #include <netinet/in.h>
@@ -7,17 +8,48 @@
 #include <unistd.h>
 #define null NULL
 
-template <typename T> void print(T t) { std::cout << t << std::endl; }
+size_t string__len(std::string s) { return s.length(); }
 
-template <typename T> void write(T t) { std::cout << t; }
-
-size_t strlen(std::string s) { return s.length(); }
-
-std::string repeat(std::string s, int n) {
+std::string string__repeat(std::string s, int n) {
   std::string out;
   for (int i = 0; i < n; i++)
     out += s;
   return out;
+}
+
+std::vector<std::string> string__split(std::string s, std::string delim) {
+  std::vector<std::string> out;
+  size_t pos = 0;
+  std::string token;
+  while ((pos = s.find(delim)) != std::string::npos) {
+    token = s.substr(0, pos);
+    out.push_back(token);
+    s.erase(0, pos + delim.length());
+  }
+  out.push_back(s);
+  return out;
+}
+
+std::string string__join(std::vector<std::string> v, std::string delim) {
+  std::string out;
+  for (int i = 0; i < v.size(); i++) {
+    out += v[i];
+    if (i + 1 != v.size())
+      out += delim;
+  }
+  return out;
+}
+
+template <typename T> void write(T t) { std::cout << t << std::endl; }
+template <typename T> void write(std::vector<T> t) {
+  std::cout << "[";
+  std::cout << string__join(t, " ");
+  std::cout << "]";
+}
+
+template <typename T> void print(T t) {
+  write(t);
+  std::cout << std::endl;
 }
 
 int net__connect(std::string host, int port) {
