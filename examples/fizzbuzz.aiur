@@ -15,6 +15,7 @@ func check(n) {
     }
 
     $ print(n)
+    return 0
 }
 
 func main() {
