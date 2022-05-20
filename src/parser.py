@@ -37,11 +37,7 @@ class Parser:
             return self.expression_statement()
 
     def if_statement(self):
-        if not self.match(TokenType.LPAREN):
-            raise SyntaxError("Expected ( after if")
         condition = self.expression()
-        if not self.match(TokenType.RPAREN):
-            raise SyntaxError("Expected ) after condition")
 
         then_branch = self.statement()
         else_branch = self.statement() if self.match(TokenType.ELSE) else None
@@ -49,11 +45,7 @@ class Parser:
         return IfStmt(condition, then_branch, else_branch)
 
     def while_statement(self):
-        if not self.match(TokenType.LPAREN):
-            raise SyntaxError("Expected ( after while")
         condition = self.expression()
-        if not self.match(TokenType.RPAREN):
-            raise SyntaxError("Expected ) after condition")
 
         body = self.statement()
 
@@ -94,25 +86,16 @@ class Parser:
 
     def return_statement(self):
         keyword = self.previous()
-        value = None
-        if not self.check(TokenType.SEMICOLON):
-            value = self.expression()
-
-        if not self.match(TokenType.SEMICOLON):
-            raise SyntaxError("Expected ; after return value")
+        value = self.expression()
 
         return ReturnStmt(keyword, value)
 
     def print_statement(self):
         value = self.expression()
-        if not self.match(TokenType.SEMICOLON):
-            raise SyntaxError("Expected ; after value")
         return PrintStmt(value)
 
     def expression_statement(self):
         expr = self.expression()
-        if not self.match(TokenType.SEMICOLON):
-            raise SyntaxError("Expected ; after expression")
         return ExpressionStmt(expr)
 
     def var_declaration(self):
@@ -124,8 +107,6 @@ class Parser:
         if self.match(TokenType.ASSIGN):
             initializer = self.expression()
 
-        if not self.match(TokenType.SEMICOLON):
-            raise SyntaxError("Expected ; after declaration")
         return VarStmt(name, initializer)
 
     def expression(self):
