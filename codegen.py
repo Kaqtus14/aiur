@@ -11,10 +11,9 @@ class CodeGenerator:
 
     def compile(self, statements):
         self.out = "#include \"lib.h\"\n\n"
-        self.out += "int main() {\n"
+
         for stmt in statements:
             self.compile_stmt(stmt)
-        self.out += "}"
 
         return self.out
 
@@ -33,22 +32,54 @@ class CodeGenerator:
         self.emit(" << std::endl;\n")
 
     def visit_if_stmt(self, stmt):
-        assert False, "unimplemented"
+        self.emit("if (")
+        self.compile_expr(stmt.condition)
+        self.emit(")")
+        self.compile_stmt(stmt.then_branch)
+
+        if stmt.else_branch is not None:
+            self.emit("\nelse")
+            self.compile_stmt(stmt.else_branch)
+        self.emitln()
 
     def visit_while_stmt(self, stmt):
-        assert False, "unimplemented"
+        self.emit("while (")
+        self.compile_expr(stmt.condition)
+        self.emit(") {")
+        self.compile_expr(stmt.body)
+        self.emitln("}")
 
     def visit_function_stmt(self, stmt):
-        assert False, "unimplemented"
+        self.emit("int ")
+        self.emit(stmt.name.lexeme)
+
+        self.emit("(")
+        self.emit(",".join(f"int {param.lexeme}" for param in stmt.params))
+        self.emit(")")
+
+        self.emitln("{")
+        for s in stmt.body.statements:
+            self.compile_stmt(s)
+        self.emitln("}")
 
     def visit_return_stmt(self, stmt):
-        assert False, "unimplemented"
+        self.emit("return")
+        if stmt.value is not None:
+            self.emit(" ")
+            self.compile_expr(stmt.value)
+        self.emitln(";")
 
     def visit_var_stmt(self, stmt):
-        assert False, "unimplemented"
+        self.emit("auto ")
+        self.emit(stmt.name.lexeme)
+        if stmt.initializer is not None:
+            self.emit(" = ")
+            self.compile_expr(stmt.initializer)
+        self.emitln(";")
 
     def visit_block_stmt(self, stmt):
-        assert False, "unimplemented"
+        for statement in stmt.statements:
+            self.compile_stmt(statement)
 
     def visit_literal(self, expr):
         if isinstance(expr.value, bool):
@@ -66,10 +97,13 @@ class CodeGenerator:
         self.emit(")")
 
     def visit_variable(self, expr):
-        assert False, "unimplemented"
+        self.emit(expr.name.lexeme)
 
     def visit_assign(self, expr):
-        assert False, "unimplemented"
+        self.emit(expr.name.lexeme)
+        self.emit(" = ")
+        self.compile_expr(expr.value)
+        self.emitln(";")
 
     def visit_unary(self, expr):
         self.emit(expr.op.lexeme)
@@ -79,7 +113,14 @@ class CodeGenerator:
         assert False, "unimplemented"
 
     def visit_call(self, expr):
-        assert False, "unimplemented"
+        self.emit(expr.callee.name.lexeme)
+        self.emit("(")
+        if expr.arguments:
+            for arg in expr.arguments:
+                self.compile_expr(arg)
+                self.emit(",")
+            self.out = self.out[:-1]
+        self.emit(")")
 
     def visit_binary(self, expr):
         self.emit("(")
@@ -88,13 +129,10 @@ class CodeGenerator:
         self.compile_expr(expr.right)
         self.emit(")")
 
-    def compile_stmt_block(self, statements, env):
-        assert False, "unimplemented"
-
     def emit(self, code):
         self.out += code
 
-    def emitln(self, code):
+    def emitln(self, code=""):
         self.emit(code+"\n")
 
     @staticmethod
