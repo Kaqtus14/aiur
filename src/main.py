@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 
@@ -25,7 +26,8 @@ def main():
     with open("output.cpp", "w+") as f:
         f.write(out)
 
-    if os.system("g++ -o output.exe output.cpp"):
+    include_path = os.path.join(os.path.dirname(__file__), "..")
+    if os.system(f"g++ -I {include_path} -o output.exe output.cpp"):
         exit(1)
 
 

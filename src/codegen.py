@@ -113,6 +113,9 @@ class CodeGenerator:
         self.emit(expr.name.lexeme)
 
     def visit_assign(self, expr):
+        if not expr.name.lexeme in self.symbols:
+            raise CompileError(f"Undefined variable: {expr.name.lexeme}")
+
         self.emit(expr.name.lexeme)
         self.emit(" = ")
         self.compile_expr(expr.value)

@@ -1,0 +1,16 @@
+func main(){
+    let sum = 0
+    let a = 0
+    let b = 1
+
+    while a < 4000000 {
+        let c = a
+        a = b
+        b = a + c
+
+        if b % 2 == 0 {
+            sum = sum + b
+        }
+    }
+    $ print(sum)
+}
