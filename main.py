@@ -1,8 +1,9 @@
+import os
 import sys
 
 from lexer import Lexer
 from parser import Parser
-from interpreter import Interpreter
+from codegen import CodeGenerator
 
 
 def run(src):
@@ -12,17 +13,18 @@ def run(src):
     parser = Parser(tokens)
     statements = parser.parse()
 
-    interpreter = Interpreter()
-    interpreter.interpret(statements)
+    interpreter = CodeGenerator()
+    out = interpreter.compile(statements)
+
+    print(out)
+    with open("output.cpp", "w+") as f:
+        f.write(out)
+    os.system("g++ -o output.exe output.cpp")
 
 
 def main():
-    if len(sys.argv) == 1:
-        while True:
-            run(input("lox> "))
-    else:
-        with open(sys.argv[1]) as f:
-            run(f.read())
+    with open(sys.argv[1]) as f:
+        run(f.read())
 
 
 if __name__ == "__main__":
