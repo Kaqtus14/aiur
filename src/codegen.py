@@ -1,19 +1,20 @@
-import time
-from dataclasses import dataclass
-from typing import Any, Callable
-
-from lexer import TokenType
+class CompileError(Exception):
+    pass
 
 
 class CodeGenerator:
     def __init__(self):
         self.out = ""
+        self.symbols = []
 
     def compile(self, statements):
         self.out = "#include \"lib.h\"\n\n"
 
         for stmt in statements:
             self.compile_stmt(stmt)
+
+        if "main" not in self.symbols:
+            raise CompileError("main function isn't defined")
 
         return self.out
 
@@ -50,6 +51,8 @@ class CodeGenerator:
         self.emitln("}")
 
     def visit_function_stmt(self, stmt):
+        self.symbols.append(stmt.name.lexeme)
+
         self.emit("int ")
         self.emit(stmt.name.lexeme)
 
@@ -70,6 +73,8 @@ class CodeGenerator:
         self.emitln(";")
 
     def visit_var_stmt(self, stmt):
+        self.symbols.append(stmt.name.lexeme)
+
         self.emit("auto ")
         self.emit(stmt.name.lexeme)
         if stmt.initializer is not None:
@@ -89,7 +94,7 @@ class CodeGenerator:
         elif isinstance(expr.value, str):
             self.emit(f"\"{expr.value}\"")
         else:
-            raise RuntimeError(f"Unexpected literal type: {type(expr.value)}")
+            raise CompileError(f"Unexpected literal type: {type(expr.value)}")
 
     def visit_grouping(self, expr):
         self.emit("(")
@@ -97,6 +102,8 @@ class CodeGenerator:
         self.emit(")")
 
     def visit_variable(self, expr):
+        if not expr.name.lexeme in self.symbols:
+            raise CompileError(f"Undefined variable: {expr.name.lexeme}")
         self.emit(expr.name.lexeme)
 
     def visit_assign(self, expr):
@@ -113,6 +120,9 @@ class CodeGenerator:
         assert False, "unimplemented"
 
     def visit_call(self, expr):
+        if not expr.name.lexeme in self.symbols:
+            raise CompileError(f"Undefined function: {expr.name.lexeme}")
+
         self.emit(expr.callee.name.lexeme)
         self.emit("(")
         if expr.arguments:
@@ -139,4 +149,4 @@ class CodeGenerator:
     def check_number(*vs):
         for v in vs:
             if type(v) != int and type(v) != float:
-                raise RuntimeError(f"expected number, got {type(v)}")
+                raise TypeError(f"Expected number, got {type(v)}")

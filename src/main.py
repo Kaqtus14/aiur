@@ -6,7 +6,7 @@ from parser import Parser
 from codegen import CodeGenerator
 
 
-def run(src):
+def compile(src):
     lexer = Lexer(src)
     tokens = lexer.scan_tokens()
 
@@ -14,17 +14,19 @@ def run(src):
     statements = parser.parse()
 
     interpreter = CodeGenerator()
-    out = interpreter.compile(statements)
-
-    print(out)
-    with open("output.cpp", "w+") as f:
-        f.write(out)
-    os.system("g++ -o output.exe output.cpp")
+    return interpreter.compile(statements)
 
 
 def main():
     with open(sys.argv[1]) as f:
-        run(f.read())
+        out = compile(f.read())
+
+    print(out)
+    with open("output.cpp", "w+") as f:
+        f.write(out)
+
+    if os.system("g++ -o output.exe output.cpp"):
+        exit(1)
 
 
 if __name__ == "__main__":
