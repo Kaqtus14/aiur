@@ -5,7 +5,8 @@ class CompileError(Exception):
 class CodeGenerator:
     def __init__(self):
         self.out = ""
-        self.symbols = set(["print", "write", "repeat"])
+        self.symbols = set(["null", "print", "write", "strlen", "repeat",
+                            "net__connect", "net__send", "net__receive"])
 
     def compile(self, statements):
         self.out = "#include \"lib.h\"\n\n"
@@ -53,15 +54,17 @@ class CodeGenerator:
 
         if len(stmt.params) > 0:
             self.emit(f"template <")
-            self.emit(", ".join([f"typename T{i}" for i in range(len(stmt.params))]))
+            self.emit(
+                ", ".join([f"typename T{i}" for i in range(len(stmt.params))]))
             self.emitln(">")
-            
+
         self.emit("auto " if stmt.name.lexeme != "main" else "int ")
         self.emit(stmt.name.lexeme)
 
         self.symbols.update(param.lexeme for param in stmt.params)
         self.emit("(")
-        self.emit(",".join(f"T{i} {param.lexeme}" for i, param in enumerate(stmt.params)))
+        self.emit(",".join(f"T{i} {param.lexeme}" for i,
+                           param in enumerate(stmt.params)))
         self.emit(")")
 
         self.emitln("{")
@@ -129,11 +132,12 @@ class CodeGenerator:
         assert False, "unimplemented"
 
     def visit_call(self, expr):
-        if not expr.callee.name.lexeme in self.symbols:
-            raise CompileError(
-                f"Undefined function: {expr.callee.name.lexeme}")
+        function = expr.callee.name.lexeme.replace(":", "_")
 
-        self.emit(expr.callee.name.lexeme)
+        if not function in self.symbols:
+            raise CompileError(f"Undefined function: {function}")
+
+        self.emit(function)
         self.emit("(")
         if expr.arguments:
             for arg in expr.arguments:

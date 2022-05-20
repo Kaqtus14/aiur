@@ -1,7 +1,0 @@
-func test(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, r) {
-    return "it works!"
-}
-
-func main() {
-    $ print(test(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
-}

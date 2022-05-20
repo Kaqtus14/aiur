@@ -159,7 +159,7 @@ class Lexer:
 
     def parse_identifier(self):
         value = self.src[self.current-1]
-        while not self.eof() and (self.peek().isalnum() or self.peek() in "_"):
+        while not self.eof() and (self.peek().isalnum() or self.peek() in "_:"):
             value += self.consume()
 
         self.add_token(KEYWORDS.get(value, TokenType.IDENTIFIER))
