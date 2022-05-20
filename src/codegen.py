@@ -45,9 +45,8 @@ class CodeGenerator:
     def visit_while_stmt(self, stmt):
         self.emit("while (")
         self.compile_expr(stmt.condition)
-        self.emit(") {")
+        self.emit(")")
         self.compile_expr(stmt.body)
-        self.emitln("}")
 
     def visit_function_stmt(self, stmt):
         self.symbols.add(stmt.name.lexeme)
@@ -89,8 +88,10 @@ class CodeGenerator:
         self.emitln(";")
 
     def visit_block_stmt(self, stmt):
+        self.emit("{")
         for statement in stmt.statements:
             self.compile_stmt(statement)
+        self.emit("}")
 
     def visit_literal(self, expr):
         if isinstance(expr.value, bool):

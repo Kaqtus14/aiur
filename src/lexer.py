@@ -14,6 +14,7 @@ class TokenType(Enum):
     MINUS = auto()
     STAR = auto()
     SLASH = auto()
+    MOD = auto()
     SEMICOLON = auto()
     BANG = auto()
     ASSIGN = auto()
@@ -119,6 +120,8 @@ class Lexer:
                     self.consume()
             else:
                 self.add_token(TokenType.SLASH)
+        elif c == "%":
+            self.add_token(TokenType.MOD)
         elif c == ";":
             self.add_token(TokenType.SEMICOLON)
         elif c == "$":
