@@ -51,13 +51,12 @@ class CodeGenerator:
     def visit_function_stmt(self, stmt):
         self.symbols.add(stmt.name.lexeme)
 
-        if stmt.name.lexeme != "main":
+        if len(stmt.params) > 0:
             self.emit(f"template <")
             self.emit(", ".join([f"typename T{i}" for i in range(len(stmt.params))]))
             self.emitln(">")
-            self.emit("auto ")
-        else:
-            self.emit("int ")
+            
+        self.emit("auto " if stmt.name.lexeme != "main" else "int ")
         self.emit(stmt.name.lexeme)
 
         self.symbols.update(param.lexeme for param in stmt.params)

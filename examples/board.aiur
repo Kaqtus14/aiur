@@ -1,0 +1,28 @@
+func row(i) {
+    let out = ""
+
+    while i < 10 {
+        if i % 2 == 1 {
+            out = out + " "
+        } else {
+            out = out + "#"
+        }
+
+        i = i + 1
+    }
+    return out
+}
+    
+func board() {
+    let out = ""
+    let i = 0
+    while i < 10 {
+        out = out + row(i % 2) + "\n"
+        i = i + 1
+    }
+    return out
+}
+
+func main() {
+    $ write(board())
+}
