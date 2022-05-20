@@ -5,7 +5,7 @@ class CompileError(Exception):
 class CodeGenerator:
     def __init__(self):
         self.out = ""
-        self.symbols = []
+        self.symbols = set()
 
     def compile(self, statements):
         self.out = "#include \"lib.h\"\n\n"
@@ -51,13 +51,19 @@ class CodeGenerator:
         self.emitln("}")
 
     def visit_function_stmt(self, stmt):
-        self.symbols.append(stmt.name.lexeme)
+        self.symbols.add(stmt.name.lexeme)
 
-        self.emit("int ")
+        if stmt.name.lexeme != "main":
+            for i in range(len(stmt.params)):
+                self.emitln(f"template <typename T{i}>")
+            self.emit("auto ")
+        else:
+            self.emit("int ")
         self.emit(stmt.name.lexeme)
 
+        self.symbols.update(param.lexeme for param in stmt.params)
         self.emit("(")
-        self.emit(",".join(f"int {param.lexeme}" for param in stmt.params))
+        self.emit(",".join(f"T{i} {param.lexeme}" for i, param in enumerate(stmt.params)))
         self.emit(")")
 
         self.emitln("{")
@@ -73,7 +79,7 @@ class CodeGenerator:
         self.emitln(";")
 
     def visit_var_stmt(self, stmt):
-        self.symbols.append(stmt.name.lexeme)
+        self.symbols.add(stmt.name.lexeme)
 
         self.emit("auto ")
         self.emit(stmt.name.lexeme)
@@ -120,8 +126,9 @@ class CodeGenerator:
         assert False, "unimplemented"
 
     def visit_call(self, expr):
-        if not expr.name.lexeme in self.symbols:
-            raise CompileError(f"Undefined function: {expr.name.lexeme}")
+        if not expr.callee.name.lexeme in self.symbols:
+            raise CompileError(
+                f"Undefined function: {expr.callee.name.lexeme}")
 
         self.emit(expr.callee.name.lexeme)
         self.emit("(")
@@ -144,9 +151,3 @@ class CodeGenerator:
 
     def emitln(self, code=""):
         self.emit(code+"\n")
-
-    @staticmethod
-    def check_number(*vs):
-        for v in vs:
-            if type(v) != int and type(v) != float:
-                raise TypeError(f"Expected number, got {type(v)}")
