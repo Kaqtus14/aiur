@@ -1,20 +1,20 @@
 func check(n) {
     if n % 15 == 0 {
-        $ print("FizzBuzz")
+        $ fmt::print("FizzBuzz")
         return 0
     }
 
     if n % 5 == 0 {
-        $ print("Fizz")
+        $ fmt::print("Fizz")
         return 0
     }
 
     if n % 3 == 0 {
-        $ print("Buzz")
+        $ fmt::print("Buzz")
         return 0
     }
 
-    $ print(n)
+    $ fmt::print(n)
     return 0
 }
 

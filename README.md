@@ -19,7 +19,7 @@ func fib(n) {
 func main() {
     let i = 0
     while i < 20 {
-        $ print(fib(i))
+        $ fmt::print(fib(i))
         i = i + 1
     }
 }

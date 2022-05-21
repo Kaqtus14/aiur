@@ -5,8 +5,9 @@ class CompileError(Exception):
 class CodeGenerator:
     def __init__(self):
         self.out = ""
-        self.symbols = set(["null", "print", "write",
+        self.symbols = set(["null",
                             "string__len", "string__repeat", "string__split", "string__join",
+                            "fmt__write", "fmt__print", "fmt__tostring",
                             "net__connect", "net__send", "net__receive"])
 
     def compile(self, statements):

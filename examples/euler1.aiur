@@ -15,5 +15,5 @@ func main() {
         i = i + 1
     }
 
-    $ print(sum)
+    $ fmt::print(sum)
 }

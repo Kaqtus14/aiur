@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 #include <netdb.h>
 #include <netinet/in.h>
@@ -40,16 +41,20 @@ std::string string__join(std::vector<std::string> v, std::string delim) {
   return out;
 }
 
-template <typename T> void write(T t) { std::cout << t << std::endl; }
-template <typename T> void write(std::vector<T> t) {
-  std::cout << "[";
-  std::cout << string__join(t, " ");
-  std::cout << "]";
+template <typename T> void fmt__write(T t) { std::cout << t; }
+template <typename T> void fmt__write(std::vector<T> t) {
+  std::cout << "[" << string__join(t, " ") << "]";
 }
 
-template <typename T> void print(T t) {
-  write(t);
+template <typename T> void fmt__print(T t) {
+  fmt__write(t);
   std::cout << std::endl;
+}
+
+template <typename T> std::string fmt__tostring(T t) {
+  std::stringstream s;
+  s << t;
+  return s.str();
 }
 
 int net__connect(std::string host, int port) {
