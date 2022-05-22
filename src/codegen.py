@@ -6,9 +6,9 @@ class CodeGenerator:
     def __init__(self):
         self.out = ""
         self.symbols = set(["null",
-                            "string__len", "string__repeat", "string__split", "string__join",
-                            "fmt__write", "fmt__print", "fmt__tostring",
-                            "net__connect", "net__send", "net__receive"])
+                            "string::len", "string::repeat", "string::split", "string::join",
+                            "fmt::write", "fmt::print", "fmt::to_string",
+                            "net::connect", "net::send_str", "net::receive"])
 
     def compile(self, statements):
         self.out = "#include \"lib.h\"\n\n"
@@ -134,7 +134,7 @@ class CodeGenerator:
         assert False, "unimplemented"
 
     def visit_call(self, expr):
-        function = expr.callee.name.lexeme.replace(":", "_")
+        function = expr.callee.name.lexeme
 
         if not function in self.symbols:
             raise CompileError(f"Undefined function: {function}")

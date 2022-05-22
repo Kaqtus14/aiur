@@ -1,6 +1,6 @@
 #include <iostream>
-#include <vector>
 #include <sstream>
+#include <vector>
 
 #include <netdb.h>
 #include <netinet/in.h>
@@ -9,16 +9,17 @@
 #include <unistd.h>
 #define null NULL
 
-size_t string__len(std::string s) { return s.length(); }
+namespace string {
+size_t len(std::string s) { return s.length(); }
 
-std::string string__repeat(std::string s, int n) {
+std::string repeat(std::string s, int n) {
   std::string out;
   for (int i = 0; i < n; i++)
     out += s;
   return out;
 }
 
-std::vector<std::string> string__split(std::string s, std::string delim) {
+std::vector<std::string> split(std::string s, std::string delim) {
   std::vector<std::string> out;
   size_t pos = 0;
   std::string token;
@@ -31,7 +32,7 @@ std::vector<std::string> string__split(std::string s, std::string delim) {
   return out;
 }
 
-std::string string__join(std::vector<std::string> v, std::string delim) {
+std::string join(std::vector<std::string> v, std::string delim) {
   std::string out;
   for (int i = 0; i < v.size(); i++) {
     out += v[i];
@@ -40,24 +41,28 @@ std::string string__join(std::vector<std::string> v, std::string delim) {
   }
   return out;
 }
+}; // namespace string
 
-template <typename T> void fmt__write(T t) { std::cout << t; }
-template <typename T> void fmt__write(std::vector<T> t) {
-  std::cout << "[" << string__join(t, " ") << "]";
+namespace fmt {
+template <typename T> void write(T t) { std::cout << t; }
+template <typename T> void write(std::vector<T> t) {
+  std::cout << "[" << string::join(t, " ") << "]";
 }
 
-template <typename T> void fmt__print(T t) {
-  fmt__write(t);
+template <typename T> void print(T t) {
+  fmt::write(t);
   std::cout << std::endl;
 }
 
-template <typename T> std::string fmt__tostring(T t) {
+template <typename T> std::string to_string(T t) {
   std::stringstream s;
   s << t;
   return s.str();
 }
+}; // namespace fmt
 
-int net__connect(std::string host, int port) {
+namespace net {
+int connect(std::string host, int port) {
   int s;
   if ((s = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     return -1;
@@ -78,13 +83,14 @@ int net__connect(std::string host, int port) {
   return s;
 }
 
-bool net__send(int s, std::string data) {
+bool send_str(int s, std::string data) {
   return send(s, data.c_str(), data.length(), 0) != -1;
 }
 
-std::string net__receive(int s) {
+std::string receive(int s) {
   char buffer[65000];
   memset(buffer, 0, 65000);
   recv(s, buffer, 65000, 0);
   return buffer;
 }
+}; // namespace net

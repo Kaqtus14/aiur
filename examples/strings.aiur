@@ -5,5 +5,5 @@ func main() {
     $ fmt::print(string::join(b, "-"))
 
     let c = 123
-    $ fmt::print(string::split(fmt::tostring(c), "2"))
+    $ fmt::print(string::split(fmt::to_string(c), "2"))
 }
