@@ -45,6 +45,16 @@ std::string join(std::vector<std::string> v, std::string delim) {
 }
 }; // namespace string
 
+namespace num {
+std::vector<int> range(int start, int end) {
+  std::vector<int> out;
+  for (int i = start; i < end; i++)
+    out.push_back(i);
+  return out;
+}
+std::vector<int> range(int end) { return range(0, end); }
+}; // namespace num
+
 namespace fmt {
 template <typename T> void write(T t) { std::cout << t; }
 template <typename T> void write(std::vector<T> t) {

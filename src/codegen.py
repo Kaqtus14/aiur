@@ -7,6 +7,7 @@ class CodeGenerator:
         self.out = ""
         self.symbols = set(["null",
                             "string::len", "string::repeat", "string::split", "string::join",
+                            "num::range",
                             "fmt::write", "fmt::print", "fmt::to_string",
                             "net::connect", "net::send_str", "net::receive"])
 
@@ -48,6 +49,15 @@ class CodeGenerator:
     def visit_while_stmt(self, stmt):
         self.emit("while (")
         self.compile_expr(stmt.condition)
+        self.emit(")")
+        self.compile_expr(stmt.body)
+
+    def visit_for_stmt(self, stmt):
+        self.emit("for (auto ")
+        self.emit(stmt.variable.lexeme)
+        self.symbols.add(stmt.variable.lexeme)
+        self.emit(" : ")
+        self.compile_expr(stmt.iterator)
         self.emit(")")
         self.compile_expr(stmt.body)
 

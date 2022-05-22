@@ -1,18 +1,18 @@
 func check(i) {
-    if i % 3 == 0 return true
-    if i % 5 == 0 return true
+    if i % 3 == 0
+        return true
+    if i % 5 == 0
+        return true
     return false
 }
 
 func main() {
     let sum = 0
 
-    let i = 0
-    while i < 1000 {
+    for i in num::range(1000) {
         if check(i) {
             sum = sum + i
         }
-        i = i + 1
     }
 
     $ fmt::print(sum)

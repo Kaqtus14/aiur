@@ -1,4 +1,4 @@
-from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, ExpressionStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, ReturnStmt, UnaryExpr, DiscardStmt, VarStmt, VariableExpr, WhileStmt
+from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, ExpressionStmt, ForStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, ReturnStmt, UnaryExpr, DiscardStmt, VarStmt, VariableExpr, WhileStmt
 from lexer import TokenType
 
 
@@ -27,6 +27,8 @@ class Parser:
             return self.if_statement()
         elif self.match(TokenType.WHILE):
             return self.while_statement()
+        elif self.match(TokenType.FOR):
+            return self.for_statement()
         elif self.match(TokenType.LBRACE):
             return self.block_statement()
         elif self.match(TokenType.FUN):
@@ -46,10 +48,16 @@ class Parser:
 
     def while_statement(self):
         condition = self.expression()
-
         body = self.statement()
-
         return WhileStmt(condition, body)
+
+    def for_statement(self):
+        variable = self.consume()
+        if not self.match(TokenType.IN):
+            raise SyntaxError("Expected 'in' after loop variable")
+        iterator = self.expression()
+        body = self.statement()
+        return ForStmt(variable, iterator, body)
 
     def function_statement(self, kind):
         if not self.match(TokenType.IDENTIFIER):

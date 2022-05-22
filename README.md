@@ -17,10 +17,8 @@ func fib(n) {
 }
 
 func main() {
-    let i = 0
-    while i < 20 {
+    for i in range(20) {
         $ fmt::print(fib(i))
-        i = i + 1
     }
 }
 ```

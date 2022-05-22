@@ -102,6 +102,16 @@ class WhileStmt(Stmt):
 
 
 @dataclass
+class ForStmt(Stmt):
+    variable: Token
+    iterator: Expr
+    body: Stmt
+
+    def accept(self, acceptor):
+        return acceptor.visit_for_stmt(self)
+
+
+@dataclass
 class FunctionStmt(Stmt):
     name: Token
     params: List[Token]

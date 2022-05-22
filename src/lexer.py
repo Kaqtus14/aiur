@@ -39,6 +39,8 @@ class TokenType(Enum):
     TRUE = auto()
     VAR = auto()
     WHILE = auto()
+    FOR = auto()
+    IN = auto()
 
     EOF = auto()
 
@@ -52,6 +54,8 @@ KEYWORDS = {
     "true": TokenType.TRUE,
     "let": TokenType.VAR,
     "while": TokenType.WHILE,
+    "for": TokenType.FOR,
+    "in": TokenType.IN,
 }
 
 
