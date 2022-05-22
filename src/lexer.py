@@ -30,19 +30,12 @@ class TokenType(Enum):
     STRING = auto()
     NUMBER = auto()
 
-    AND = auto()
-    CLASS = auto()
     ELSE = auto()
     FALSE = auto()
-    FOR = auto()
     FUN = auto()
     IF = auto()
-    NIL = auto()
-    OR = auto()
     DISCARD = auto()
     RETURN = auto()
-    SUPER = auto()
-    THIS = auto()
     TRUE = auto()
     VAR = auto()
     WHILE = auto()
@@ -51,18 +44,11 @@ class TokenType(Enum):
 
 
 KEYWORDS = {
-    "and": TokenType.AND,
-    "class": TokenType.CLASS,
     "else": TokenType.ELSE,
     "false": TokenType.FALSE,
-    "for": TokenType.FOR,
     "func": TokenType.FUN,
     "if": TokenType.IF,
-    "nil": TokenType.NIL,
-    "or": TokenType.OR,
     "return": TokenType.RETURN,
-    "super": TokenType.SUPER,
-    "this": TokenType.THIS,
     "true": TokenType.TRUE,
     "let": TokenType.VAR,
     "while": TokenType.WHILE,

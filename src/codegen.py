@@ -130,9 +130,6 @@ class CodeGenerator:
         self.emit(expr.op.lexeme)
         self.compile_expr(expr.right)
 
-    def visit_logical(self, expr):
-        assert False, "unimplemented"
-
     def visit_call(self, expr):
         function = expr.callee.name.lexeme
 

@@ -44,16 +44,6 @@ class UnaryExpr(Expr):
 
 
 @dataclass
-class LogicalExpr(Expr):
-    left: Expr
-    op: Token
-    right: Expr
-
-    def accept(self, acceptor):
-        return acceptor.visit_logical(self)
-
-
-@dataclass
 class VariableExpr(Expr):
     name: Token
 

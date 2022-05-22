@@ -1,4 +1,4 @@
-from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, ExpressionStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, LogicalExpr, ReturnStmt, UnaryExpr, DiscardStmt, VarStmt, VariableExpr, WhileStmt
+from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, ExpressionStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, ReturnStmt, UnaryExpr, DiscardStmt, VarStmt, VariableExpr, WhileStmt
 from lexer import TokenType
 
 
@@ -112,28 +112,8 @@ class Parser:
     def expression(self):
         return self.assignment()
 
-    def _or(self):
-        expr = self._and()
-
-        while self.match(TokenType.OR):
-            op = self.previous()
-            right = self._and()
-            expr = LogicalExpr(expr, op, right)
-
-        return expr
-
-    def _and(self):
-        expr = self.equality()
-
-        while self.match(TokenType.AND):
-            op = self.previous()
-            right = self.equality()
-            expr = LogicalExpr(expr, op, right)
-
-        return expr
-
     def assignment(self):
-        expr = self._or()
+        expr = self.equality()
 
         if self.match(TokenType.ASSIGN):
             value = self.assignment()
@@ -210,7 +190,7 @@ class Parser:
             arguments.append(self.expression())
             while self.match(TokenType.COMMA):
                 arguments.append(self.expression())
-        
+
         if not self.match(TokenType.RPAREN):
             raise SyntaxError("Expected ) after arguments")
         paren = self.previous()
@@ -222,8 +202,6 @@ class Parser:
             return LiteralExpr(True)
         elif self.match(TokenType.FALSE):
             return LiteralExpr(False)
-        elif self.match(TokenType.NIL):
-            return LiteralExpr(None)
         elif self.match(TokenType.NUMBER, TokenType.STRING):
             return LiteralExpr(self.previous().literal)
         elif self.match(TokenType.LPAREN):
