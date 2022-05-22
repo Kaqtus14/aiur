@@ -1,4 +1,4 @@
-from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, ExpressionStmt, ForStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, ReturnStmt, UnaryExpr, DiscardStmt, VarStmt, VariableExpr, WhileStmt
+from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, ExpressionStmt, ForStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, ReturnStmt, UnaryExpr, VarStmt, VariableExpr, WhileStmt
 from lexer import TokenType
 
 
@@ -21,9 +21,7 @@ class Parser:
         return self.statement()
 
     def statement(self):
-        if self.match(TokenType.DISCARD):
-            return self.discard_statement()
-        elif self.match(TokenType.IF):
+        if self.match(TokenType.IF):
             return self.if_statement()
         elif self.match(TokenType.WHILE):
             return self.while_statement()
@@ -97,10 +95,6 @@ class Parser:
         value = self.expression()
 
         return ReturnStmt(keyword, value)
-
-    def discard_statement(self):
-        value = self.expression()
-        return DiscardStmt(value)
 
     def expression_statement(self):
         expr = self.expression()

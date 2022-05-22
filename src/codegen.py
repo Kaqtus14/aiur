@@ -30,9 +30,6 @@ class CodeGenerator:
 
     def visit_expression_stmt(self, stmt):
         self.compile_expr(stmt.expr)
-
-    def visit_discard_stmt(self, stmt):
-        self.compile_expr(stmt.expr)
         self.emitln(";")
 
     def visit_if_stmt(self, stmt):

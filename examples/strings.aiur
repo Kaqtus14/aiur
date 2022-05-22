@@ -1,9 +1,9 @@
 func main() {
     let a = "abc|def|ghi"
     let b = string::split(a, "|")
-    $ fmt::print(b)
-    $ fmt::print(string::join(b, "-"))
+    fmt::print(b)
+    fmt::print(string::join(b, "-"))
 
     let c = 123
-    $ fmt::print(string::split(fmt::to_string(c), "2"))
+    fmt::print(string::split(fmt::to_string(c), "2"))
 }

@@ -19,5 +19,5 @@ func board() {
 }
 
 func main() {
-    $ fmt::write(board())
+    fmt::write(board())
 }

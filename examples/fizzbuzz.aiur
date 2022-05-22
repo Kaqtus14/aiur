@@ -1,24 +1,24 @@
 func check(n) {
     if n % 15 == 0 {
-        $ fmt::print("FizzBuzz")
+        fmt::print("FizzBuzz")
         return 0
     }
 
     if n % 5 == 0 {
-        $ fmt::print("Fizz")
+        fmt::print("Fizz")
         return 0
     }
 
     if n % 3 == 0 {
-        $ fmt::print("Buzz")
+        fmt::print("Buzz")
         return 0
     }
 
-    $ fmt::print(n)
+    fmt::print(n)
 }
 
 func main() {
     for i in num::range(20) {
-        $ check(i)
+        check(i)
     }
 }

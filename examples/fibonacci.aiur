@@ -7,6 +7,6 @@ func fib(n) {
 
 func main() {
     for i in num::range(20) {
-        $ fmt::print(fib(i))
+        fmt::print(fib(i))
     }
 }

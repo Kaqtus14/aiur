@@ -12,5 +12,5 @@ func main(){
             sum = sum + b
         }
     }
-    $ fmt::print(sum)
+    fmt::print(sum)
 }

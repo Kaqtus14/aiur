@@ -122,14 +122,6 @@ class FunctionStmt(Stmt):
 
 
 @dataclass
-class DiscardStmt(Stmt):
-    expr: Token
-
-    def accept(self, acceptor):
-        return acceptor.visit_discard_stmt(self)
-
-
-@dataclass
 class VarStmt(Stmt):
     name: Token
     initializer: Expr
