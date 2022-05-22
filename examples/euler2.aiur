@@ -8,9 +8,8 @@ func main(){
         a = b
         b = a + c
 
-        if b % 2 == 0 {
+        if b % 2 == 0
             sum = sum + b
-        }
     }
     fmt::print(sum)
 }

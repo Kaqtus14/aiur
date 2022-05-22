@@ -1,25 +1,20 @@
 func is_prime(n) {
-    let i = 2
-
-    while i*i < n {
+    for i in num::range(2, num::sqrt(n)) {
         if n % i == 0 {
             return false
         }
-        i = i + 1
     }
     return true
 }
 
 func main() {
     let n = 600851475143
-    let i = 2
 
-    while i*i < n {
+    for i in num::range(2, num::sqrt(n)) {
         if n % i == 0 {
             if is_prime(i) {
                 fmt::print(i)
             }
         }
-        i = i + 1
     }
 }

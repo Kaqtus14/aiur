@@ -7,7 +7,7 @@ class CodeGenerator:
         self.out = ""
         self.symbols = set(["null",
                             "string::len", "string::repeat", "string::split", "string::join",
-                            "num::range",
+                            "num::range", "num::sqrt",
                             "fmt::write", "fmt::print", "fmt::to_string",
                             "net::connect", "net::send_str", "net::receive"])
 

@@ -3,9 +3,11 @@
 My programming language
 
 ## Features
-- [x] Compiles to C++
-- [x] No dependencies
-- [x] Cross-platform
+- Compiles to C++
+- Rust-like syntax
+- No semicolons
+- No dependencies
+- Cross-platform
 
 ## Syntax
 ```cpp
@@ -18,7 +20,7 @@ func fib(n) {
 
 func main() {
     for i in range(20) {
-        $ fmt::print(fib(i))
+        fmt::print(fib(i))
     }
 }
 ```

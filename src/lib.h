@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -53,6 +54,8 @@ std::vector<int> range(int start, int end) {
   return out;
 }
 std::vector<int> range(int end) { return range(0, end); }
+
+float sqrt(float n) { return std::sqrt(n); }
 }; // namespace num
 
 namespace fmt {

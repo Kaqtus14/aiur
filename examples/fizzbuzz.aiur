@@ -1,24 +1,20 @@
 func check(n) {
     if n % 15 == 0 {
         fmt::print("FizzBuzz")
-        return 0
+    } else {
+        if n % 5 == 0 {
+            fmt::print("Fizz")
+        } else {
+            if n % 3 == 0 {
+                fmt::print("Buzz")
+            } else {
+                fmt::print(n)
+            }
+        }
     }
-
-    if n % 5 == 0 {
-        fmt::print("Fizz")
-        return 0
-    }
-
-    if n % 3 == 0 {
-        fmt::print("Buzz")
-        return 0
-    }
-
-    fmt::print(n)
 }
 
 func main() {
-    for i in num::range(20) {
+    for i in num::range(20)
         check(i)
-    }
 }
