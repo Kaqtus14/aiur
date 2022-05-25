@@ -10,7 +10,7 @@ My programming language
 - Cross-platform
 
 ## Syntax
-```cpp
+```rust
 func fib(n) {
     if n <= 1
         return n

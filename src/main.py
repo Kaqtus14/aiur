@@ -26,7 +26,7 @@ def main():
     with open("output.cpp", "w+") as f:
         f.write(out)
 
-    include_path = os.path.dirname(__file__)
+    include_path = os.path.join(os.path.dirname(__file__), "..", "stdlib")
     if os.system(f"g++ -I {include_path} -o output.exe output.cpp"):
         exit(1)
 

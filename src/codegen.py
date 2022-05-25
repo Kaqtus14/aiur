@@ -1,18 +1,24 @@
+import os
+import re
+
+
 class CompileError(Exception):
     pass
 
 
 class CodeGenerator:
+    MOD_PATH = os.path.join(os.path.dirname(__file__), "..", "stdlib")
+
     def __init__(self):
         self.out = ""
-        self.symbols = set(["null",
-                            "string::len", "string::repeat", "string::split", "string::join",
-                            "num::range", "num::sqrt",
-                            "fmt::write", "fmt::print", "fmt::to_string",
-                            "net::connect", "net::send_str", "net::receive"])
+        self.mods = os.listdir(self.MOD_PATH)
+        self.symbols = set()
 
     def compile(self, statements):
-        self.out = "#include \"lib.h\"\n\n"
+        for mod in self.mods:
+            self.symbols.update(self.get_mod_symbols(mod))
+            self.out += "#include \"%s\"\n" % mod
+        self.out += "\n"
 
         for stmt in statements:
             self.compile_stmt(stmt)
@@ -164,3 +170,14 @@ class CodeGenerator:
 
     def emitln(self, code=""):
         self.emit(code+"\n")
+
+    def get_mod_symbols(self, mod):
+        symbols = set()
+
+        with open(os.path.join(self.MOD_PATH, mod)) as f:
+            matches = re.finditer(
+                r"\/\/(\s+)?export ([a-zA-Z0-9:_]+)", f.read(), re.MULTILINE)
+
+            for match in matches:
+                symbols.add(match.group(2))
+        return symbols
