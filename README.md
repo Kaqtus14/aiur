@@ -9,6 +9,11 @@ My programming language
 - No dependencies
 - Cross-platform
 
+## TODO
+- Catch errors at transpile-time
+- Expand stdlib
+- Make variables immutable by default
+
 ## Syntax
 ```rust
 func fib(n) {

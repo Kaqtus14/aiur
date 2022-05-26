@@ -3,6 +3,9 @@
 #include <vector>
 
 namespace string {
+// export string::alphabet
+std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
+
 // export string::len
 size_t len(std::string s) { return s.length(); }
 
@@ -36,4 +39,4 @@ std::string join(std::vector<std::string> v, std::string delim) {
   }
   return out;
 }
-}; // namespace string
+}

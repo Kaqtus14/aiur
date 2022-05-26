@@ -43,4 +43,4 @@ std::string receive(int s) {
   recv(s, buffer, 65000, 0);
   return buffer;
 }
-}; // namespace net
+}

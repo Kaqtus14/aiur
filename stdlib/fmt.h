@@ -24,4 +24,4 @@ template <typename T> std::string to_string(T t) {
   s << t;
   return s.str();
 }
-}; // namespace fmt
+}
