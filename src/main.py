@@ -2,25 +2,27 @@
 import os
 import sys
 
+from ctx import Context
 from lexer import Lexer
 from parser import Parser
 from codegen import CodeGenerator
 
 
-def compile(src):
-    lexer = Lexer(src)
+def compile(ctx):
+    lexer = Lexer(ctx)
     tokens = lexer.scan_tokens()
 
-    parser = Parser(tokens)
+    parser = Parser(ctx, tokens)
     statements = parser.parse()
 
-    interpreter = CodeGenerator()
+    interpreter = CodeGenerator(ctx)
     return interpreter.compile(statements)
 
 
 def main():
     with open(sys.argv[1]) as f:
-        out = compile(f.read())
+        ctx = Context(sys.argv[1],f.read())
+    out = compile(ctx)
 
     print(out)
     with open("output.cpp", "w+") as f:

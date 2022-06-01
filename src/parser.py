@@ -1,9 +1,11 @@
+import ctx
 from expr import AssignExpr, BinaryExpr, BlockStmt, CallExpr, DeferStmt, ExpressionStmt, ForStmt, FunctionStmt, GroupingExpr, IfStmt, LiteralExpr, ReturnStmt, UnaryExpr, VarStmt, VariableExpr, WhileStmt
 from lexer import TokenType
 
 
 class Parser:
-    def __init__(self, tokens):
+    def __init__(self, ctx, tokens):
+        self.ctx = ctx
         self.tokens = tokens
         self.current = 0
 
@@ -18,7 +20,8 @@ class Parser:
     def declaration(self):
         if self.match(TokenType.VAR):
             return self.var_declaration()
-        return self.statement()
+        else:
+            return self.statement()
 
     def statement(self):
         if self.match(TokenType.IF):
@@ -30,7 +33,7 @@ class Parser:
         elif self.match(TokenType.LBRACE):
             return self.block_statement()
         elif self.match(TokenType.FUN):
-            return self.function_statement("function")
+            return self.function_statement()
         elif self.match(TokenType.RETURN):
             return self.return_statement()
         elif self.match(TokenType.DEFER):
@@ -54,18 +57,21 @@ class Parser:
     def for_statement(self):
         variable = self.consume()
         if not self.match(TokenType.IN):
-            raise SyntaxError("Expected 'in' after loop variable")
+            ctx.error(
+                f"expected IN, got {self.peek().typ}", self.ctx, self.peek().pos)
         iterator = self.expression()
         body = self.statement()
         return ForStmt(variable, iterator, body)
 
-    def function_statement(self, kind):
+    def function_statement(self):
         if not self.match(TokenType.IDENTIFIER):
-            raise SyntaxError(f"Expected {kind}")
+            ctx.error(
+                f"expected function name, got {self.peek().typ}", self.ctx, self.peek().pos)
         name = self.previous()
 
         if not self.match(TokenType.LPAREN):
-            raise SyntaxError("Expected (")
+            ctx.error(
+                f"expected (, got {self.peek().typ}", self.ctx, self.peek().pos)
 
         parameters = []
 
@@ -75,9 +81,11 @@ class Parser:
                 parameters.append(self.consume())
 
         if not self.match(TokenType.RPAREN):
-            raise SyntaxError("Expected )")
+            ctx.error(f"expected ), got {self.peek().typ}",
+                      self.ctx, self.peek().pos)
         if not self.match(TokenType.LBRACE):
-            raise SyntaxError("Expected {")
+            ctx.error(f"expected {{, got {self.peek().typ}",
+                      self.ctx, self.peek().pos)
 
         body = self.block_statement()
         return FunctionStmt(name, parameters, body)
@@ -89,7 +97,9 @@ class Parser:
             statements.append(self.declaration())
 
         if not self.match(TokenType.RBRACE):
-            raise SyntaxError("Expected } after block")
+            ctx.error(
+                f"expected }}, got {self.peek().typ}", self.ctx, self.peek().pos)
+
         return BlockStmt(statements)
 
     def return_statement(self):
@@ -100,7 +110,9 @@ class Parser:
 
     def defer_statement(self):
         if not self.match(TokenType.LBRACE):
-            raise SyntaxError("Expected { after defer")
+            ctx.error(f"expected {{, got {self.peek().typ}",
+                      self.ctx, self.peek().pos)
+
         return DeferStmt(self.block_statement())
 
     def expression_statement(self):
@@ -109,7 +121,8 @@ class Parser:
 
     def var_declaration(self):
         if not self.match(TokenType.IDENTIFIER):
-            raise SyntaxError("Expected variable name")
+            ctx.error(
+                f"expected variable name, got {self.peek().typ}", self.ctx, self.peek().pos)
         name = self.previous()
 
         initializer = None
@@ -130,7 +143,8 @@ class Parser:
             if isinstance(expr, VariableExpr):
                 return AssignExpr(expr.name, value)
             else:
-                raise SyntaxError("Invalid assignment target")
+                ctx.error("invalid assignment target",
+                          self.ctx, self.peek().pos)
 
         return expr
 
@@ -201,7 +215,8 @@ class Parser:
                 arguments.append(self.expression())
 
         if not self.match(TokenType.RPAREN):
-            raise SyntaxError("Expected ) after arguments")
+            ctx.error(f"expected ), got {self.peek().typ}",
+                      self.ctx, self.peek().pos)
         paren = self.previous()
 
         return CallExpr(callee, paren, arguments)
@@ -217,13 +232,15 @@ class Parser:
             expr = self.expression()
 
             if self.consume().typ != TokenType.RPAREN:
-                raise SyntaxError("expected ) after expression")
+                ctx.error(
+                    f"expected ), got {self.peek().typ}", self.ctx, self.peek().pos)
 
             return GroupingExpr(expr)
         elif self.match(TokenType.IDENTIFIER):
             return VariableExpr(self.previous())
         else:
-            raise SyntaxError(f"unexpected {self.peek()}")
+            ctx.error(f"unexpected {self.peek().typ}",
+                      self.ctx, self.peek().pos)
 
     def match(self, *types):
         for typ in types:

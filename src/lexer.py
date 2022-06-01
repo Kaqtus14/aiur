@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any
+from typing import Any, Tuple
+import ctx
 
 
 class TokenType(Enum):
@@ -34,7 +35,6 @@ class TokenType(Enum):
     FALSE = auto()
     FUN = auto()
     IF = auto()
-    DISCARD = auto()
     RETURN = auto()
     TRUE = auto()
     VAR = auto()
@@ -66,13 +66,14 @@ class Token:
     typ: TokenType
     lexeme: str
     literal: Any
-    line: int
+    pos: Tuple[int, int]
 
 
 class Lexer:
-    def __init__(self, src):
-        self.src = src
+    def __init__(self, ctx):
+        self.ctx = ctx
         self.tokens = []
+        self.pos = 0
         self.line = 1
         self.start = 0
         self.current = 0
@@ -82,7 +83,8 @@ class Lexer:
             self.start = self.current
             self.scan_token()
 
-        self.tokens.append(Token(TokenType.EOF, "", None, self.line))
+        self.tokens.append(
+            Token(TokenType.EOF, "", None, (self.line, self.pos)))
         return self.tokens
 
     def scan_token(self):
@@ -116,8 +118,6 @@ class Lexer:
             self.add_token(TokenType.MOD)
         elif c == ";":
             self.add_token(TokenType.SEMICOLON)
-        elif c == "$":
-            self.add_token(TokenType.DISCARD)
         elif c == "!":
             self.add_token(TokenType.NEQ if self.match("=")
                            else TokenType.BANG)
@@ -136,21 +136,22 @@ class Lexer:
             self.parse_identifier()
         elif c == "\n":
             self.line += 1
+            self.pos = 0
         elif c.isspace():
             pass
         else:
-            raise SyntaxError(f"unexpected character: {c}")
+            ctx.error(
+                f"unexpected character: {c}", self.ctx, (self.line, self.pos))
 
     def parse_number(self):
-        value = self.src[self.current-1]
+        value = self.ctx.src[self.current-1]
         while not self.eof() and (self.peek().isdigit() or self.peek() == "."):
             value += self.consume()
 
         self.add_token(TokenType.NUMBER, int(value))
 
-
     def parse_identifier(self):
-        value = self.src[self.current-1]
+        value = self.ctx.src[self.current-1]
         while not self.eof() and (self.peek().isalnum() or self.peek() in "_:"):
             value += self.consume()
 
@@ -162,13 +163,14 @@ class Lexer:
             value += self.consume()
 
         if self.consume() != "\"":
-            raise SyntaxError("unterminated string literal")
+            ctx.error("unterminated string literal",
+                        self.file, (self.line, self.pos))
 
         self.add_token(TokenType.STRING, value)
 
     def add_token(self, typ, literal=None):
         self.tokens.append(
-            Token(typ, self.src[self.start:self.current], literal, self.line))
+            Token(typ, self.ctx.src[self.start:self.current], literal, (self.line, self.pos)))
 
     def match(self, expected):
         if self.eof():
@@ -177,17 +179,19 @@ class Lexer:
             return False
 
         self.current += 1
+        self.pos += 1
         return True
 
     def consume(self):
         c = self.peek()
         self.current += 1
+        self.pos += 1
         return c
 
     def peek(self):
         if self.eof():
             return "\0"
-        return self.src[self.current]
+        return self.ctx.src[self.current]
 
     def eof(self):
-        return self.current >= len(self.src)
+        return self.current >= len(self.ctx.src)

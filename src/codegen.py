@@ -1,5 +1,6 @@
 import os
 import re
+import ctx
 
 
 class CompileError(Exception):
@@ -9,7 +10,8 @@ class CompileError(Exception):
 class CodeGenerator:
     MOD_PATH = os.path.join(os.path.dirname(__file__), "..", "stdlib")
 
-    def __init__(self):
+    def __init__(self, ctx):
+        self.ctx = ctx
         self.out = ""
         self.mods = os.listdir(self.MOD_PATH)
         self.symbols = set()
@@ -24,7 +26,7 @@ class CodeGenerator:
             self.compile_stmt(stmt)
 
         if "main" not in self.symbols:
-            raise CompileError("main function isn't defined")
+            ctx.error("main function isn't defined", self.ctx)
 
         return self.out
 
@@ -125,7 +127,7 @@ class CodeGenerator:
         elif isinstance(expr.value, str):
             self.emit(f"std::string(\"{expr.value}\")")
         else:
-            raise CompileError(f"Unexpected literal type: {type(expr.value)}")
+            assert False, "unreachable"
 
     def visit_grouping(self, expr):
         self.emit("(")
@@ -134,12 +136,12 @@ class CodeGenerator:
 
     def visit_variable(self, expr):
         if not expr.name.lexeme in self.symbols:
-            raise CompileError(f"Undefined variable: {expr.name.lexeme}")
+            ctx.error(f"undefined variable: {expr.name.lexeme}", self.ctx, expr.name.pos)
         self.emit(expr.name.lexeme)
 
     def visit_assign(self, expr):
         if not expr.name.lexeme in self.symbols:
-            raise CompileError(f"Undefined variable: {expr.name.lexeme}")
+            ctx.error(f"undefined variable: {expr.name.lexeme}", self.ctx, expr.name.pos)
 
         self.emit(expr.name.lexeme)
         self.emit(" = ")
@@ -154,7 +156,7 @@ class CodeGenerator:
         function = expr.callee.name.lexeme
 
         if not function in self.symbols:
-            raise CompileError(f"Undefined function: {function}")
+            ctx.error(f"undefined function: {function}", self.ctx, expr.callee.name.pos)
 
         self.emit(function)
         self.emit("(")
