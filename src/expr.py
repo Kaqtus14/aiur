@@ -145,3 +145,11 @@ class BlockStmt(Stmt):
 
     def accept(self, acceptor):
         return acceptor.visit_block_stmt(self)
+
+
+@dataclass
+class DeferStmt(Stmt):
+    block: Stmt
+
+    def accept(self, acceptor):
+        return acceptor.visit_defer_stmt(self)

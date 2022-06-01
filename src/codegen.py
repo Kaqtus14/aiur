@@ -45,7 +45,8 @@ class CodeGenerator:
         self.compile_stmt(stmt.then_branch)
 
         if stmt.else_branch is not None:
-            self.emit("\nelse")
+            self.emitln()
+            self.emit("else")
             self.compile_stmt(stmt.else_branch)
         self.emitln()
 
@@ -105,10 +106,16 @@ class CodeGenerator:
         self.emitln(";")
 
     def visit_block_stmt(self, stmt):
-        self.emit("{")
+        self.emitln("{")
         for statement in stmt.statements:
             self.compile_stmt(statement)
+        self.emitln()
         self.emit("}")
+
+    def visit_defer_stmt(self, stmt):
+        self.emit("ScopeGuard guard([]()")
+        self.compile_stmt(stmt.block)
+        self.emitln(");")
 
     def visit_literal(self, expr):
         if isinstance(expr.value, bool):

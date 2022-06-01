@@ -41,6 +41,7 @@ class TokenType(Enum):
     WHILE = auto()
     FOR = auto()
     IN = auto()
+    DEFER = auto()
 
     EOF = auto()
 
@@ -56,6 +57,7 @@ KEYWORDS = {
     "while": TokenType.WHILE,
     "for": TokenType.FOR,
     "in": TokenType.IN,
+    "defer": TokenType.DEFER,
 }
 
 

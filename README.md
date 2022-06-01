@@ -15,7 +15,7 @@ My programming language
 - Make variables immutable by default
 
 ## Syntax
-```rust
+```go
 func fib(n) {
     if n <= 1
         return n
@@ -24,6 +24,8 @@ func fib(n) {
 }
 
 func main() {
+    defer fmt::print("Finished!")
+
     for i in range(20) {
         fmt::print(fib(i))
     }
