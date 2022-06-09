@@ -1,17 +1,21 @@
 func check(n) {
     if n % 15 == 0 {
         fmt::print("FizzBuzz")
-    } else {
-        if n % 5 == 0 {
-            fmt::print("Fizz")
-        } else {
-            if n % 3 == 0 {
-                fmt::print("Buzz")
-            } else {
-                fmt::print(n)
-            }
-        }
+        return null
     }
+    
+    if n % 5 == 0 {
+        fmt::print("Fizz")
+        return null
+    }
+    
+    if n % 3 == 0 {
+        fmt::print("Buzz")
+        return null
+    }
+
+    fmt::print(n)
+    return null
 }
 
 func main() {

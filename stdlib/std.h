@@ -1,8 +1,12 @@
 #include <functional>
 
+// export null
+#define null 0
+
 class ScopeGuard {
 public:
-  ScopeGuard(std::function<void()> callback) : m_callback(std::move(callback)) {}
+  ScopeGuard(std::function<void()> callback)
+      : m_callback(std::move(callback)) {}
 
   ~ScopeGuard() { m_callback(); }
 

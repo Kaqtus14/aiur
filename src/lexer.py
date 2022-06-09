@@ -166,7 +166,7 @@ class Lexer:
             ctx.error("unterminated string literal",
                         self.file, (self.line, self.pos))
 
-        self.add_token(TokenType.STRING, value)
+        self.add_token(TokenType.STRING, value.replace("\n", "\\n"))
 
     def add_token(self, typ, literal=None):
         self.tokens.append(

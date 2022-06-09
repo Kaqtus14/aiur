@@ -1,7 +1,11 @@
 func main() {
     let sock = net::connect("google.com", 80)
 
-    net::send_str(sock, "GET / HTTP/1.0\r\nHost: www.google.com\r\nUser-Agent: AiurHTTP\r\n\r\n")
+    net::send_str(sock, "GET / HTTP/1.0\r
+Host: www.google.com\r
+User-Agent: AiurHTTP\r
+\r
+")
 
     let resp = "resp"
     while string::len(resp) > 0 {

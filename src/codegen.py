@@ -64,7 +64,7 @@ class CodeGenerator:
         self.symbols.add(stmt.variable.lexeme)
         self.emit(" : ")
         self.compile_expr(stmt.iterator)
-        self.emit(")")
+        self.emit(") ")
         self.compile_expr(stmt.body)
 
     def visit_function_stmt(self, stmt):
@@ -111,7 +111,6 @@ class CodeGenerator:
         self.emitln("{")
         for statement in stmt.statements:
             self.compile_stmt(statement)
-        self.emitln()
         self.emit("}")
 
     def visit_defer_stmt(self, stmt):
