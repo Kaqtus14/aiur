@@ -1,15 +1,3 @@
 func main() {
-    let sock = net::connect("google.com", 80)
-
-    net::send_str(sock, "GET / HTTP/1.0\r
-Host: www.google.com\r
-User-Agent: AiurHTTP\r
-\r
-")
-
-    let resp = "resp"
-    while string::len(resp) > 0 {
-        resp = net::receive(sock)
-        fmt::print(resp)
-    }
+    fmt::print(net::http_get("http://www.google.com/teapot"))
 }

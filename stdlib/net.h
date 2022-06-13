@@ -8,6 +8,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "_string.h"
+
 namespace net {
 // export net::connect
 int connect(std::string host, int port) {
@@ -42,5 +44,32 @@ std::string receive(int s) {
   memset(buffer, 0, 65000);
   recv(s, buffer, 65000, 0);
   return buffer;
+}
+
+// export net::http_get
+std::string http_get(std::string url) {
+  if (string::contains(url, "://"))
+    url = string::split(url, "://")[1];
+
+  std::string path = "/";
+
+  if (string::contains(url, "/")) {
+    path = url.substr(url.find("/"));
+    url = url.substr(0, url.find("/"));
+  }
+  std::string host = url;
+
+  int sock = net::connect(host, 80);
+  net::send_str(sock, "GET " + path + " HTTP/1.0\r\nHost: " + host + "\r\n\r\n");
+
+  std::string out, chunk;
+  do {
+    chunk = net::receive(sock);
+    out += chunk;
+  } while (string::len(chunk) > 0);
+
+  out.erase(0, out.find("\r\n\r\n")+4);
+
+  return out;
 }
 }

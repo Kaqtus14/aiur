@@ -1,11 +1,9 @@
 #pragma once
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
 namespace string {
-// export string::alphabet
-std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
-
 // export string::len
 size_t len(std::string s) { return s.length(); }
 
@@ -15,6 +13,11 @@ std::string repeat(std::string s, int n) {
   for (int i = 0; i < n; i++)
     out += s;
   return out;
+}
+
+// export string::contains
+bool contains(std::string s, std::string n) {
+  return s.find(n) != std::string::npos;
 }
 
 // export string::split
@@ -38,5 +41,15 @@ std::string join(std::vector<std::string> v, std::string delim) {
       out += delim;
   }
   return out;
+}
+
+// export string::replace
+std::string replace(std::string s, std::string from, std::string to) {
+  size_t n = 0;
+  while ((n = s.find(from, n)) != std::string::npos) {
+    s.replace(n, from.length(), to);
+    n += to.length();
+  }
+  return s;
 }
 }
