@@ -142,10 +142,11 @@ class CodeGenerator:
         if not expr.name.lexeme in self.symbols:
             ctx.error(f"undefined variable: {expr.name.lexeme}", self.ctx, expr.name.pos)
 
+        self.emit("(")
         self.emit(expr.name.lexeme)
         self.emit(" = ")
         self.compile_expr(expr.value)
-        self.emitln(";")
+        self.emit(")")
 
     def visit_unary(self, expr):
         self.emit(expr.op.lexeme)

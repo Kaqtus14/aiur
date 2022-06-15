@@ -19,9 +19,11 @@ func fib(n) {
 }
 
 func main() {
-    defer fmt::print("Finished!")
+    defer {
+        fmt::print("Finished!")
+    }
 
-    for i in range(20) {
+    for i in num::range(20) {
         fmt::print(fib(i))
     }
 }
