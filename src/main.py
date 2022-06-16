@@ -24,7 +24,7 @@ def compile_file(args):
     include_path = os.path.join(os.path.dirname(__file__), "..", "stdlib")
 
     with open(args.path) as f:
-        ctx = Context(args.path, f.read())
+        ctx = Context(args.path, f.read(), include_path)
     out = compile(ctx)
 
     with open(args.build_path, "w+") as f:
@@ -39,8 +39,9 @@ def compile_file(args):
 
 
 def run_tests(args):
-    for file in os.listdir("examples/"):
-        proc = subprocess.Popen("./aiur c -r examples/"+file,
+    aiur_path = os.path.join(os.path.dirname(__file__), "..")
+    for file in os.listdir(aiur_path+"/examples"):
+        proc = subprocess.Popen(f"{aiur_path}/aiur c -r {aiur_path}/examples/{file}",
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         proc.wait()
         if proc.returncode == 0:

@@ -8,12 +8,10 @@ class CompileError(Exception):
 
 
 class CodeGenerator:
-    MOD_PATH = os.path.join(os.path.dirname(__file__), "..", "stdlib")
-
     def __init__(self, ctx):
         self.ctx = ctx
         self.out = ""
-        self.mods = os.listdir(self.MOD_PATH)
+        self.mods = os.listdir(self.ctx.include_path)
         self.symbols = set()
 
     def compile(self, statements):
@@ -183,7 +181,7 @@ class CodeGenerator:
     def get_mod_symbols(self, mod):
         symbols = set()
 
-        with open(os.path.join(self.MOD_PATH, mod)) as f:
+        with open(os.path.join(self.ctx.include_path, mod)) as f:
             matches = re.finditer(
                 r"\/\/(\s+)?export ([a-zA-Z0-9:_]+)", f.read(), re.MULTILINE)
 
