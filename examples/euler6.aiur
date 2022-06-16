@@ -1,0 +1,21 @@
+func sum_of_squares() {
+    let sum = 0
+
+    for i in num::range(1, 101)
+        sum = sum + i * i
+
+    return sum
+}
+
+func square_of_sum() {
+    let sum = 0
+
+    for i in num::range(1, 101)
+        sum = sum + i
+
+    return sum * sum
+}
+
+func main() {
+    fmt::print(square_of_sum() - sum_of_squares())
+}

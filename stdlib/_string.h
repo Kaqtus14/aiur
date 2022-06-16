@@ -7,6 +7,9 @@ namespace string {
 // export string::len
 size_t len(std::string s) { return s.length(); }
 
+// export string::at
+char at(std::string s, int n) { return s[n]; }
+
 // export string::repeat
 std::string repeat(std::string s, int n) {
   std::string out;
@@ -20,10 +23,15 @@ bool contains(std::string s, std::string n) {
   return s.find(n) != std::string::npos;
 }
 
+// export string::substr
+std::string substr(std::string s, int start, int size) {
+  return s.substr(start, size);
+}
+
 // export string::reverse
 std::string reverse(std::string s) {
-    std::reverse(s.begin(), s.end());
-    return s;
+  std::reverse(s.begin(), s.end());
+  return s;
 }
 
 // export string::split

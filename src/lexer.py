@@ -159,7 +159,10 @@ class Lexer:
 
     def parse_string(self):
         value = ""
+
         while not self.eof() and self.peek() != "\"":
+            if self.peek() == "\n":
+                self.line += 1
             value += self.consume()
 
         if self.consume() != "\"":
