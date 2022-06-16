@@ -20,6 +20,12 @@ bool contains(std::string s, std::string n) {
   return s.find(n) != std::string::npos;
 }
 
+// export string::reverse
+std::string reverse(std::string s) {
+    std::reverse(s.begin(), s.end());
+    return s;
+}
+
 // export string::split
 std::vector<std::string> split(std::string s, std::string delim) {
   std::vector<std::string> out;

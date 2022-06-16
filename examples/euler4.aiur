@@ -1,0 +1,17 @@
+func main() {
+    let largest = 0
+
+    for x in num::range(1000) {
+        for y in num::range(1000) {
+            let z = x * y
+            let s = fmt::to_string(z)
+            if s == string::reverse(s) {
+                if z > largest {
+                    largest = z
+                }
+            }
+        }
+    }
+
+    fmt::print(largest)
+}

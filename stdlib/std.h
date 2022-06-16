@@ -1,5 +1,7 @@
 #include <functional>
 
+// export exit
+
 // export null
 #define null 0
 
