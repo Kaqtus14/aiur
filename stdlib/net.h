@@ -33,6 +33,35 @@ int connect(std::string host, int port) {
   return s;
 }
 
+// export net::server
+int server(int port) {
+  int s, c, opt = 1;
+  struct sockaddr_in sa;
+
+  if ((s = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+    return -1;
+
+  if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+    return -1;
+
+  sa.sin_family = AF_INET;
+  sa.sin_addr.s_addr = INADDR_ANY;
+  sa.sin_port = htons(port);
+  int salen = sizeof(sa);
+
+  if (bind(s, (struct sockaddr *)&sa, sizeof(sa)) < 0)
+    return -1;
+
+  if (listen(s, 100) < 0)
+    return -1;
+
+  if ((c = accept(s, (struct sockaddr *)&sa, (socklen_t *)&salen)) < 0)
+    return -1;
+  close(s);
+
+  return c;
+}
+
 // export net::send_str
 bool send_str(int s, std::string data) {
   return send(s, data.c_str(), data.length(), 0) != -1;
@@ -60,7 +89,8 @@ std::string http_get(std::string url) {
   std::string host = url;
 
   int sock = net::connect(host, 80);
-  net::send_str(sock, "GET " + path + " HTTP/1.0\r\nHost: " + host + "\r\n\r\n");
+  net::send_str(sock,
+                "GET " + path + " HTTP/1.0\r\nHost: " + host + "\r\n\r\n");
 
   std::string out, chunk;
   do {
@@ -68,7 +98,7 @@ std::string http_get(std::string url) {
     out += chunk;
   } while (string::len(chunk) > 0);
 
-  out.erase(0, out.find("\r\n\r\n")+4);
+  out.erase(0, out.find("\r\n\r\n") + 4);
 
   return out;
 }
